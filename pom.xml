@@ -93,41 +93,7 @@
 		</snapshotRepository>
 	</distributionManagement>
 	<dependencyManagement>
-
-		<dependencies>
-			<dependency>
-				<groupId>org.openmrs.api</groupId>
-				<artifactId>openmrs-api</artifactId>
-				<version>${openmrsPlatformVersion}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs.web</groupId>
-				<artifactId>openmrs-web</artifactId>
-				<version>${openmrsPlatformVersion}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs.api</groupId>
-				<artifactId>openmrs-api</artifactId>
-				<version>${openmrsPlatformVersion}</version>
-				<type>test-jar</type>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs.web</groupId>
-				<artifactId>openmrs-web</artifactId>
-				<version>${openmrsPlatformVersion}</version>
-				<classifier>tests</classifier>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs.test</groupId>
-				<artifactId>openmrs-test</artifactId>
-				<version>${openmrsPlatformVersion}</version>
-				<type>pom</type>
-				<scope>test</scope>
-			</dependency>
+		<dependencies>			
 			<dependency>
 				<groupId>org.openmrs</groupId>
 				<artifactId>event-api</artifactId>
@@ -142,7 +108,6 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
 	<properties>
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<fhir2Version>1.3.0</fhir2Version>
