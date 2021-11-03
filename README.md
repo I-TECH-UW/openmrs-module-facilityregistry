@@ -1,5 +1,6 @@
 Facility Registry Client Module
 ==========================
+[![Build with Maven](https://github.com/I-TECH-UW/openmrs-module-facilityregistry/actions/workflows/main.yml/badge.svg)](https://github.com/I-TECH-UW/openmrs-module-facilityregistry/actions/workflows/main.yml)
 
 Description
 -----------
