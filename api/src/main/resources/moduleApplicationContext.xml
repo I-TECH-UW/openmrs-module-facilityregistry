@@ -27,7 +27,7 @@
 
     <!-- Wraps FacilityRegistryClientService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
-    <bean id="facilityregistry.FacilityRegistryClientService"
+    <!-- <bean id="facilityregistry.FacilityRegistryClientService"
             class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager" />
@@ -43,16 +43,16 @@
         <property name="transactionAttributeSource">
             <ref bean="transactionAttributeSource" />
         </property>
-    </bean>
+    </bean> -->
 
     <!-- Adds FacilityRegistryClientService to OpenMRS context so it can be accessed
     calling Context.getService(FacilityRegistryClientService.class) -->
-    <bean parent="serviceContext">
+    <!-- <bean parent="serviceContext">
         <property name="moduleService">
             <list>
                 <value>org.openmrs.module.facilityregistry.api.FacilityRegistryClientService</value>
                 <ref bean="facilityregistry.FacilityRegistryClientService" />
             </list>
         </property>
-    </bean>
+    </bean> -->
 </beans>
