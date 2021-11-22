@@ -22,7 +22,15 @@ import org.openmrs.module.facilityregistry.FacilityRegistryConstants;
 import org.openmrs.module.facilityregistry.utils.FhirUtils;
 import org.openmrs.module.fhir2.api.FhirLocationService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * A scheduled task that automatically poll data from a Facility Registry Server ie GOFR
+ */
 public class FacilityRegistryTask extends AbstractTask {
+	
+	private static final Logger log = LoggerFactory.getLogger(FacilityRegistryTask.class);
 	
 	private AdministrationService administrationService;
 	
@@ -30,10 +38,9 @@ public class FacilityRegistryTask extends AbstractTask {
 	public void execute() {
 		Bundle searchBundle;
 		try {
+			log.info("executing FacilityRegistryTask");
 			searchBundle = getFhirClient().search().forResource(Location.class).returnBundle(Bundle.class).execute();
-			System.out.println("........test Bundle............");
-			System.out.println(
-			    FhirUtils.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(searchBundle));
+			log.debug(FhirUtils.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(searchBundle));
 			saveFhirLocation(searchBundle);
 			while (searchBundle.getLink(IBaseBundle.LINK_NEXT) != null) {
 				searchBundle = getFhirClient().loadPage().next(searchBundle).execute();
@@ -41,26 +48,38 @@ public class FacilityRegistryTask extends AbstractTask {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 		
 	}
 	
+	/**
+	 * Creates Fhir Client with Bearer Authentication
+	 * 
+	 * @return IGenericClient
+	 */
 	private IGenericClient getFhirClient() throws IOException {
 		administrationService = Context.getAdministrationService();
-		String fhirStorePath = administrationService
-		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_SERVER_URL);
-		String authUrl = administrationService.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_AUTH_URL);
+		String fhirStorePath = administrationService.getGlobalProperty(
+		    FacilityRegistryConstants.GP_FACILITY_REGISTRY_SERVER_URL, "http://localhost:4000/fhir/DEFAULT");
+		String authUrl = administrationService.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_AUTH_URL,
+		    "http://localhost:4000/auth/token");
 		String authUserName = administrationService
-		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_USER_NAME);
-		String authPassowrd = administrationService
-		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_PASSWORD);
-		String token = FhirUtils.getAccesToken(authUrl, authUserName, authPassowrd);
-		System.out.println("........test Token............");
-		System.out.println(token);
+		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_USER_NAME, "root@gofr.org");
+		String authPassword = administrationService
+		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_PASSWORD, "gofr");
+		
+		String token = FhirUtils.getAccesToken(authUrl, authUserName, authPassword);
+		log.info("generating Bearer Token");
+		log.debug(token);
 		return FhirUtils.getFhirClient(fhirStorePath, token);
 	}
 	
+	/**
+	 * Loads the FHIR2 FhirLocationService from the Application Context
+	 * 
+	 * @return FhirLocationService
+	 */
 	private FhirLocationService getFhirLocationService() {
 		try {
 			Field serviceContextField = Context.class.getDeclaredField("serviceContext");
@@ -81,6 +100,11 @@ public class FacilityRegistryTask extends AbstractTask {
 		}
 	}
 	
+	/**
+	 * Saves/Updates Fhir Location into the OpenMRS database
+	 * 
+	 * @param searchBundle Bundle fetched form the Facility Registry Server
+	 */
 	private void saveFhirLocation(Bundle searchBundle) {
 		FhirLocationService locationService = getFhirLocationService();
 		for (BundleEntryComponent entry : searchBundle.getEntry()) {
@@ -95,10 +119,10 @@ public class FacilityRegistryTask extends AbstractTask {
 				}
 				if (Objects.isNull(existingLocation)) {
 					locationService.create(newLocation);
-					System.out.println("created new Location" + newLocation.getIdElement().getIdPart());
+					log.debug("created new Location Resource with ID " + newLocation.getIdElement().getIdPart());
 				} else {
 					locationService.update(newLocation.getIdElement().getIdPart(), newLocation);
-					System.out.println("Updated Location" + newLocation.getIdElement().getIdPart());
+					log.debug("Updated Location Resource with ID " + newLocation.getIdElement().getIdPart());
 				}
 				
 			}
