@@ -13,27 +13,26 @@
         for a list of supported elements and attributes
     -->
  
- 	<!-- Uncomment the changeset below if you want to make the Item class persistable, see also Item and FacilityRegistryClientDaoTest -->
- 	<!--
-	<changeSet id="facilityregistry-2016-08-02-12-21" author="raff">
+	<changeSet id="facilityregistry-1" author="mosesmutesa" >
 		<preConditions onFail="MARK_RAN">
-			<not><tableExists tableName="facilityregistry_item"/></not>
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM scheduler_task_config
+				WHERE schedulable_class = 'org.openmrs.module.facilityregistry.task.FacilityRegistryTask'
+				And name = 'Facility Registry Task'
+			</sqlCheck>
 		</preConditions>
-		<comment>
-			Creating the facilityregistry_item table
-		</comment>
-		<createTable tableName="facilityregistry_item">
-			<column name="facilityregistry_item_id" type="int" autoIncrement="true">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="uuid" type="char(38)">
-				<constraints nullable="false" unique="true"></constraints>
-			</column>
-			<column name="owner" type="int" />
-			<column name="description" type="varchar(255)" />
-		</createTable>
-        <addForeignKeyConstraint constraintName="facilityregistry_item_owner_fk" baseTableName="facilityregistry_item" baseColumnNames="owner"  referencedTableName="users"
-                                 referencedColumnNames="user_id" />
-    </changeSet> -->
+		<comment>Inserting Facility Registry Task into 'schedule_task_config' table</comment>
+		<insert tableName="scheduler_task_config">
+			<column name="name" value="Facility Registry Task" />
+			<column name="description" value="Fetches Facility List from the Facility Registry Server" />
+			<column name="schedulable_class" value="org.openmrs.module.facilityregistry.task.FacilityRegistryTask" />
+			<column name="start_on_startup" valueNumeric="1" />
+			<column name="repeat_interval" value="10000" />
+			<column name="date_created" valueDate="2020-01-01T00:00:00" />
+			<column name="created_by" value="1" />
+			<column name="uuid" value="0c5a0540-48af-11ec-81d3-0242ac130003" />
+		</insert>
+	</changeSet>
+
  
 </databaseChangeLog>

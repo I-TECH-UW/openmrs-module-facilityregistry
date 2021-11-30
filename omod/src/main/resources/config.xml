@@ -50,17 +50,36 @@
 	 /Required Privileges -->
 
 
-	<!-- Required Global Properties 
+	<!--Required Global Properties -->
 	<globalProperty>
-		<property>@MODULE_ID@.someProperty</property>
-		<defaultValue></defaultValue>
+		<property>@MODULE_ID@.serverUrl</property>
+		<defaultValue>http://localhost:4000/fhir/DEFAULT</defaultValue>
 		<description>
-			A description of the global property goes here.  The description
-			should explain enough for administrators to understand the purpose
-			and possible values for the global property.
+			Base Url for the Facility Registry Server 
 		</description>
 	</globalProperty>
-	/Required Global Properties -->
+	<globalProperty>
+		<property>@MODULE_ID@.authUrl</property>
+		<defaultValue>http://localhost:4000/auth/token</defaultValue>
+		<description>
+			Auth url for the Facility Registry Server  ,for generating the Authorization Bearer Token
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.userName</property>
+		<defaultValue>root@gofr.org</defaultValue>
+		<description>
+			Login username for the Facility Registry Server 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.password</property>
+		<defaultValue>gofr</defaultValue>
+		<description>
+			Login password for the Facility Registry Server 
+		</description>
+	</globalProperty>
+	<!--Required Global Properties -->
 
 	
 	<!-- Servlets -->
