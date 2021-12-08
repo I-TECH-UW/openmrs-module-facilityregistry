@@ -137,7 +137,7 @@
     </build>
 	<properties>
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
-		<fhir2Version>1.3.0</fhir2Version>
+		<fhir2Version>1.4.0-SNAPSHOT</fhir2Version>
 		<eventVersion>2.10.0</eventVersion>
 		<javaCompilerVersion>1.8</javaCompilerVersion>
 		<javaCompilerSource>1.8</javaCompilerSource>
