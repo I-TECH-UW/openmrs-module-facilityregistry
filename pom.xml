@@ -106,6 +106,18 @@
 				<version>${fhir2Version}</version>
 				<scope>provided</scope>
 			</dependency>
+		    <dependency>
+				<groupId>com.github.tomakehurst</groupId>
+				<artifactId>wiremock</artifactId>
+				 <version>${wireMockVersion}</version>
+				<scope>test</scope>
+			</dependency>
+			 <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombokVersion}</version>
+                <scope>provided</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -142,5 +154,7 @@
 		<javaCompilerVersion>1.8</javaCompilerVersion>
 		<javaCompilerSource>1.8</javaCompilerSource>
         <javaCompilerTarget>1.8</javaCompilerTarget>
+		<lombokVersion>1.18.16</lombokVersion>
+		<wireMockVersion>2.4.1</wireMockVersion>
 	</properties>
 </project>

@@ -16,18 +16,18 @@
 			<dependency>
 				<groupId>org.openmrs</groupId>
 				<artifactId>event-api</artifactId>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>fhir2-api</artifactId>
-				<scope>provided</scope>
 			</dependency>
-			    <dependency>
+			<dependency>
 				<groupId>com.github.tomakehurst</groupId>
 				<artifactId>wiremock</artifactId>
-				<version>2.4.1</version>
-				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+		    </dependency>
 	</dependencies>
 </project>
