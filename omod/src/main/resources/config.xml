@@ -79,6 +79,13 @@
 			Login password for the Facility Registry Server 
 		</description>
 	</globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.organisationIdentifierSystem</property>
+		<defaultValue>http://fhir.openmrs.org/organization/identifier</defaultValue>
+		<description>
+			Organization Identifier System  
+		</description>
+	</globalProperty>
 	<!--Required Global Properties -->
 
 	

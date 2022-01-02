@@ -20,24 +20,24 @@ import org.openmrs.module.fhir2.api.search.param.SearchParameterMap;
 import org.openmrs.util.PrivilegeConstants;
 
 public interface FhirOrganizationDao extends FhirDao<FhirOrganization> {
-    
-    @Override
-    @Authorized(PrivilegeConstants.GET_LOCATIONS)
-    FhirOrganization get(@Nonnull String uuid);
-    
-    @Override
-    @Authorized(PrivilegeConstants.MANAGE_LOCATIONS)
-    FhirOrganization createOrUpdate(@Nonnull FhirOrganization newEntry);
-    
-    @Override
-    @Authorized(PrivilegeConstants.MANAGE_LOCATIONS)
-    FhirOrganization delete(@Nonnull String uuid);
-    
-    @Override
-    @Authorized(PrivilegeConstants.GET_LOCATIONS)
-    List<String> getSearchResultUuids(@Nonnull SearchParameterMap theParams);
-    
-    @Override
-    @Authorized(PrivilegeConstants.GET_LOCATIONS)
-    List<FhirOrganization> getSearchResults(@Nonnull SearchParameterMap theParams, @Nonnull List<String> resourceUuids);
+	
+	@Override
+	@Authorized(PrivilegeConstants.GET_LOCATIONS)
+	FhirOrganization get(@Nonnull String uuid);
+	
+	@Override
+	@Authorized(PrivilegeConstants.MANAGE_LOCATIONS)
+	FhirOrganization createOrUpdate(@Nonnull FhirOrganization newEntry);
+	
+	@Override
+	@Authorized(PrivilegeConstants.MANAGE_LOCATIONS)
+	FhirOrganization delete(@Nonnull String uuid);
+	
+	@Override
+	@Authorized(PrivilegeConstants.GET_LOCATIONS)
+	List<String> getSearchResultUuids(@Nonnull SearchParameterMap theParams);
+	
+	@Override
+	@Authorized(PrivilegeConstants.GET_LOCATIONS)
+	List<FhirOrganization> getSearchResults(@Nonnull SearchParameterMap theParams, @Nonnull List<String> resourceUuids);
 }

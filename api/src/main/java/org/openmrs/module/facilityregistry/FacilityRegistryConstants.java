@@ -19,18 +19,22 @@ public class FacilityRegistryConstants {
 	
 	public static final String GP_FACILITY_REGISTRY_PASSWORD = "facilityregistry.password";
 	
-	public static final String FACILITY_REGISTRY_LOCATION = "mCSD_Location";
+	public static final String GP_FACILITY_REGISTRY_ORG_ID_SYSTEM = "facilityregistry.organisationIdentifierSystem";
 	
-	public static final String FACILITY_REGISTRY_LOCATION_FHIR_SYSTEM = "http://facility_registry/mcsd_location";
+	public static final String FACILITY_REGISTRY_LOCATION = "mCSD Location";
 	
-	public static final String FACILITY_REGISTRY_ORGANISATION = "mCSD_Organization";
+	public static final String FACILITY_REGISTRY_LOCATION_FHIR_SYSTEM = "http://facilityRegistry/mcsd.location";
 	
-	public static final String FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM = "http://facility_registry/mcsd_organisation";
+	public static final String FACILITY_REGISTRY_ORGANISATION = "mCSD Organization";
 	
-	public static final String FACILITY_REGISTRY_ORGANISATION_NAME_PREFIX = "mCSD_Org_";
+	public static final String FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM = "http://facilityRegistry/mcsd.organisation";
+	
+	public static final String FACILITY_REGISTRY_ORGANISATION_NAME_PREFIX = "mCSD_";
 	
 	public static final String MCSD_EXTENTION_URL = "http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension";
 	
 	public static final String MCSD_EXTENTION_URL_PART_OF = "part-of";
+	
+	public static final String MCSD_EXTENTION_URL_HIERACHY_TYPE = "hierarchy-type";
 	
 }

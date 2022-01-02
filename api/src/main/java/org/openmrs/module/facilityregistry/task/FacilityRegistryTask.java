@@ -126,7 +126,7 @@ public class FacilityRegistryTask extends AbstractTask {
 			if (entry.hasResource()) {
 				if (ResourceType.Location.equals(entry.getResource().getResourceType())) {
 					Location newLocation = (Location) entry.getResource();
-					// tag the Location from Facility Registry as mCSD_Location
+					// tag the Location from Facility Registry as mCSD Location
 					newLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION_FHIR_SYSTEM,
 					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION,
 					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION);

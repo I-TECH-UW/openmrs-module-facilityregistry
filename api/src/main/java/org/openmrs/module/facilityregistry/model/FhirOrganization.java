@@ -1,12 +1,19 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.facilityregistry.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +21,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -40,12 +46,8 @@ public class FhirOrganization extends BaseOpenmrsData {
 	@Column(name = "organization_id")
 	private Integer id;
 	
-	@ElementCollection(targetClass = String.class)
-	@CollectionTable(name = "fhir_organization_identifier", joinColumns = {
-	        @JoinColumn(name = "organization_id", referencedColumnName = "organization_id") })
-	@MapKeyColumn(name = "identifier_system")
-	@Column(name = "identifier_code")
-	private Map<String, String> identifier;
+	@Column(name = "name", nullable = false, length = 255)
+	private String name;
 	
 	@Column(name = "active")
 	private Boolean active;
@@ -56,24 +58,38 @@ public class FhirOrganization extends BaseOpenmrsData {
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "fhir_organization_addresses", joinColumns = @JoinColumn(name = "organization_id"), inverseJoinColumns = @JoinColumn(name = "organization_address_id"))
-	private List<FhirOganisationAddress> address;
+	private List<FhirOganizationAddress> address;
 	
-	// The organization id, of which this organization forms a part
-	@Column(name = "partof_orgid")
-	private String partOfOrgId;
+	// The organization, of which this organization forms a part
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "partof_org_id", referencedColumnName = "organization_id")
+	private FhirOrganization partOfOrg;
 	
-	// part-of organization id ,defined by the http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension
-    @Column(name = "mcsd_partof_orgid")
-	private String mcsdPartOfOrgId;
+	// part-of organization ,defined by the http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "mcsd_partof_org_id", referencedColumnName = "organization_id")
+	private FhirOrganization mcsdPartOfOrg;
 	
 	//hierarchy-type Coding ,defined by the http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension
 	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "hierachy_concept_id", referencedColumnName = "concept_id")
-	private Concept hierarchyType;
+	@JoinColumn(name = "mcsd_hierachy_concept_id", referencedColumnName = "concept_id")
+	private Concept mcsdHierarchyType;
 	
-	@Column(name = "name", nullable = false, length = 255)
-	private String name;
+	public void addAddress(FhirOganizationAddress newAddress) {
+		if (address == null) {
+			address = new ArrayList<FhirOganizationAddress>();
+		}
+		if (address != null && !address.contains(newAddress)) {
+			address.add(newAddress);
+		}
+	}
 	
-	@Column(name = "description", length = 255)
-	private String description;	
+	public void addType(Concept newType) {
+		if (type == null) {
+			type = new ArrayList<Concept>();
+		}
+		if (type != null && !type.contains(newType)) {
+			type.add(newType);
+		}
+	}
 }
