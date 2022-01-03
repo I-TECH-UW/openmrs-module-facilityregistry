@@ -28,6 +28,7 @@ import org.openmrs.module.facilityregistry.api.translators.OrganizationTranslato
 import org.openmrs.module.facilityregistry.model.FhirOganizationAddress;
 import org.openmrs.module.facilityregistry.model.FhirOrganization;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.openmrs.module.fhir2.api.translators.ConceptTranslator;
 import org.openmrs.module.fhir2.api.translators.impl.BaseReferenceHandlingTranslator;
@@ -42,6 +43,7 @@ import static org.apache.commons.lang3.Validate.notNull;
 public class OrganizationTranslatorImpl extends BaseReferenceHandlingTranslator implements OrganizationTranslator {
     
     @Autowired
+    @Qualifier("adminService")
     private AdministrationService administrationService;
     
     @Autowired
