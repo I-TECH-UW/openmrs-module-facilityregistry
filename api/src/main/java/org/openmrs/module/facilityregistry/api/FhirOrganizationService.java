@@ -15,7 +15,6 @@ import ca.uhn.fhir.model.api.Include;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.DateRangeParam;
-import ca.uhn.fhir.rest.param.ReferenceAndListParam;
 import ca.uhn.fhir.rest.param.StringAndListParam;
 import ca.uhn.fhir.rest.param.TokenAndListParam;
 import org.hl7.fhir.r4.model.Organization;
@@ -24,7 +23,6 @@ import org.openmrs.module.fhir2.api.FhirService;
 public interface FhirOrganizationService extends FhirService<Organization> {
 	
 	IBundleProvider searchForLocations(StringAndListParam name, StringAndListParam city, StringAndListParam country,
-	        StringAndListParam postalCode, StringAndListParam state, TokenAndListParam tag, ReferenceAndListParam parent,
-	        TokenAndListParam id, DateRangeParam lastUpdated, HashSet<Include> includes, HashSet<Include> revIncludes,
-	        SortSpec sort);
+	        StringAndListParam postalCode, StringAndListParam state, TokenAndListParam id, DateRangeParam lastUpdated,
+	        HashSet<Include> includes, SortSpec sort);
 }
