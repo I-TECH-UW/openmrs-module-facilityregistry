@@ -131,7 +131,7 @@
 			<column name="state" type="varchar(255)"/>
 			<column name="district" type="varchar(255)"/>
 		    <column name="country" type="varchar(255)"/>
-		    <column name="postalCode" type="varchar(255)"/>
+		    <column name="postal_code" type="varchar(255)"/>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>

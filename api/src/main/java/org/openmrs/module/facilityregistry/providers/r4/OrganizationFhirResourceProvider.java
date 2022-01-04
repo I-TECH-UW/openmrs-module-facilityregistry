@@ -54,75 +54,75 @@ import org.springframework.stereotype.Component;
 @R4Provider
 @Setter(PACKAGE)
 public class OrganizationFhirResourceProvider implements IResourceProvider {
-    
-    @Autowired
-    private FhirOrganizationService fhirOrganizationService;
-    
-    @Override
-    public Class<? extends IBaseResource> getResourceType() {
-        return Organization.class;
-    }
-    
-    @Read
-    @SuppressWarnings("unused")
-    public Organization getLocationById(@IdParam @Nonnull IdType id) {
-        Organization organization = fhirOrganizationService.get(id.getIdPart());
-        if (organization == null) {
-            throw new ResourceNotFoundException("Could not find Organization with Id " + id.getIdPart());
-        }
-        return organization;
-    }
-    
-    @Create
-    public MethodOutcome createOrganization(@ResourceParam Organization organization) {
-        return FhirProviderUtils.buildCreate(fhirOrganizationService.create(organization));
-    }
-    
-    @Update
-    @SuppressWarnings("unused")
-    public MethodOutcome updateOrganization(@IdParam IdType id, @ResourceParam Organization organization) {
-        if (id == null || id.getIdPart() == null) {
-            throw new InvalidRequestException("id must be specified to update");
-        }
-        return FhirProviderUtils.buildUpdate(fhirOrganizationService.update(id.getIdPart(), organization));
-    }
-    
-    @Delete
-    @SuppressWarnings("unused")
-    public OperationOutcome deleteLocation(@IdParam @Nonnull IdType id) {
-        Organization organization = fhirOrganizationService.delete(id.getIdPart());
-        if (organization == null) {
-            throw new ResourceNotFoundException("Could not find Organization to delete with id " + id.getIdPart());
-        }
-        return FhirProviderUtils.buildDelete(organization);
-    }
-    
-    @History
-    @SuppressWarnings("unused")
-    public List<Resource> getLocationHistoryById(@IdParam @Nonnull IdType id) {
-        Organization organization = fhirOrganizationService.get(id.getIdPart());
-        if (organization == null) {
-            throw new ResourceNotFoundException("Could not find Organization with Id " + id.getIdPart());
-        }
-        return organization.getContained();
-    }
-    
-    @Search
-    public IBundleProvider searchLocations(@OptionalParam(name = Organization.SP_NAME) StringAndListParam name,
-            @OptionalParam(name = Organization.SP_ADDRESS_CITY) StringAndListParam city,
-            @OptionalParam(name = Organization.SP_ADDRESS_COUNTRY) StringAndListParam country,
-            @OptionalParam(name = Organization.SP_ADDRESS_POSTALCODE) StringAndListParam postalCode,
-            @OptionalParam(name = Organization.SP_ADDRESS_STATE) StringAndListParam state,
-            @OptionalParam(name = Organization.SP_RES_ID) TokenAndListParam id,
-            @OptionalParam(name = "_lastUpdated") DateRangeParam lastUpdated,
-            @IncludeParam(allow = { "Organization:" + Organization.SP_PARTOF }) HashSet<Include> includes,
-            @Sort SortSpec sort) {
-        
-        if (CollectionUtils.isEmpty(includes)) {
-            includes = null;
-        }
-        
-        return fhirOrganizationService.searchForLocations(name, city, country, postalCode, state, id, lastUpdated, includes,
-            sort);
-    }
+	
+	@Autowired
+	private FhirOrganizationService fhirOrganizationService;
+	
+	@Override
+	public Class<? extends IBaseResource> getResourceType() {
+		return Organization.class;
+	}
+	
+	@Read
+	@SuppressWarnings("unused")
+	public Organization getLocationById(@IdParam @Nonnull IdType id) {
+		Organization organization = fhirOrganizationService.get(id.getIdPart());
+		if (organization == null) {
+			throw new ResourceNotFoundException("Could not find Organization with Id " + id.getIdPart());
+		}
+		return organization;
+	}
+	
+	@Create
+	public MethodOutcome createOrganization(@ResourceParam Organization organization) {
+		return FhirProviderUtils.buildCreate(fhirOrganizationService.create(organization));
+	}
+	
+	@Update
+	@SuppressWarnings("unused")
+	public MethodOutcome updateOrganization(@IdParam IdType id, @ResourceParam Organization organization) {
+		if (id == null || id.getIdPart() == null) {
+			throw new InvalidRequestException("id must be specified to update");
+		}
+		return FhirProviderUtils.buildUpdate(fhirOrganizationService.update(id.getIdPart(), organization));
+	}
+	
+	@Delete
+	@SuppressWarnings("unused")
+	public OperationOutcome deleteLocation(@IdParam @Nonnull IdType id) {
+		Organization organization = fhirOrganizationService.delete(id.getIdPart());
+		if (organization == null) {
+			throw new ResourceNotFoundException("Could not find Organization to delete with id " + id.getIdPart());
+		}
+		return FhirProviderUtils.buildDelete(organization);
+	}
+	
+	@History
+	@SuppressWarnings("unused")
+	public List<Resource> getLocationHistoryById(@IdParam @Nonnull IdType id) {
+		Organization organization = fhirOrganizationService.get(id.getIdPart());
+		if (organization == null) {
+			throw new ResourceNotFoundException("Could not find Organization with Id " + id.getIdPart());
+		}
+		return organization.getContained();
+	}
+	
+	@Search
+	public IBundleProvider searchLocations(@OptionalParam(name = Organization.SP_NAME) StringAndListParam name,
+	        @OptionalParam(name = Organization.SP_ADDRESS_CITY) StringAndListParam city,
+	        @OptionalParam(name = Organization.SP_ADDRESS_COUNTRY) StringAndListParam country,
+	        @OptionalParam(name = Organization.SP_ADDRESS_POSTALCODE) StringAndListParam postalCode,
+	        @OptionalParam(name = Organization.SP_ADDRESS_STATE) StringAndListParam state,
+	        @OptionalParam(name = Organization.SP_RES_ID) TokenAndListParam id,
+	        @OptionalParam(name = "_lastUpdated") DateRangeParam lastUpdated,
+	        @IncludeParam(allow = { "Organization:" + Organization.SP_PARTOF }) HashSet<Include> includes,
+	        @Sort SortSpec sort) {
+		
+		if (CollectionUtils.isEmpty(includes)) {
+			includes = null;
+		}
+		
+		return fhirOrganizationService.searchForLocations(name, city, country, postalCode, state, id, lastUpdated, includes,
+		    sort);
+	}
 }

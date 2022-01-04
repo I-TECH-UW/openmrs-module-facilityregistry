@@ -14,10 +14,13 @@ import org.junit.Test;
 import org.junit.Test.None;
 import org.openmrs.api.ValidationException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.facilityregistry.TestFhirSpringConfiguration;
 import org.openmrs.scheduler.SchedulerService;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.test.context.ContextConfiguration;
 
+@ContextConfiguration(classes = TestFhirSpringConfiguration.class, inheritLocations = false)
 public class FacilityRegistryTaskTest extends BaseModuleContextSensitiveTest {
 	
 	private SchedulerService schedulerService;

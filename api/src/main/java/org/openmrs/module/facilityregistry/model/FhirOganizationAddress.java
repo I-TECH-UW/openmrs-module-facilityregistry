@@ -49,6 +49,6 @@ public class FhirOganizationAddress extends BaseOpenmrsMetadata {
 	@Column(name = "country", length = 255)
 	private String country;
 	
-	@Column(name = "postalCode", length = 255)
+	@Column(name = "postal_code", length = 255)
 	private String postalCode;
 }

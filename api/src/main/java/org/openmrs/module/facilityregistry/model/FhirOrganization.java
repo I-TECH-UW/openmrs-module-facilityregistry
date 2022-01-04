@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.facilityregistry.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -54,11 +54,11 @@ public class FhirOrganization extends BaseOpenmrsData {
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "fhir_organization_type", joinColumns = @JoinColumn(name = "organization_id"), inverseJoinColumns = @JoinColumn(name = "concept_id"))
-	private List<Concept> type;
+	private Set<Concept> type;
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "fhir_organization_addresses", joinColumns = @JoinColumn(name = "organization_id"), inverseJoinColumns = @JoinColumn(name = "organization_address_id"))
-	private List<FhirOganizationAddress> address;
+	private Set<FhirOganizationAddress> address;
 	
 	// The organization, of which this organization forms a part
 	@ManyToOne(cascade = CascadeType.ALL)
@@ -77,7 +77,7 @@ public class FhirOrganization extends BaseOpenmrsData {
 	
 	public void addAddress(FhirOganizationAddress newAddress) {
 		if (address == null) {
-			address = new ArrayList<FhirOganizationAddress>();
+			address = new HashSet<>();
 		}
 		if (address != null && !address.contains(newAddress)) {
 			address.add(newAddress);
@@ -86,7 +86,7 @@ public class FhirOrganization extends BaseOpenmrsData {
 	
 	public void addType(Concept newType) {
 		if (type == null) {
-			type = new ArrayList<Concept>();
+			type = new HashSet<>();
 		}
 		if (type != null && !type.contains(newType)) {
 			type.add(newType);

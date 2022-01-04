@@ -41,134 +41,133 @@ import static org.apache.commons.lang3.Validate.notNull;
 @Component
 @Setter(AccessLevel.PACKAGE)
 public class OrganizationTranslatorImpl extends BaseReferenceHandlingTranslator implements OrganizationTranslator {
-    
-    @Autowired
-    @Qualifier("adminService")
-    private AdministrationService administrationService;
-    
-    @Autowired
-    private ConceptTranslator conceptTranslator;
-    
-    @Autowired
-    private FhirOrganizationDao fhirOrganizationDao;
-    
-    @Override
-    public Organization toFhirResource(@Nonnull FhirOrganization openmrsOrg) {
-        notNull(openmrsOrg, "The Openmrs Fhir Organization object should not be null");
-        Organization fhirOrg = new Organization();
-        fhirOrg.setId(openmrsOrg.getUuid());
-        fhirOrg.setName(openmrsOrg.getName());
-        Identifier identifier = fhirOrg.addIdentifier();
-        identifier.setSystem(
-            administrationService.getGlobalProperty(FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM,
-                "http://fhir.openmrs.org/organization/identifier")).setValue(openmrsOrg.getUuid());
-        for (FhirOganizationAddress openmrsAddress : openmrsOrg.getAddress()) {
-            Address fhirAddress = fhirOrg.addAddress();
-            fhirAddress.setCity(openmrsAddress.getCity());
-            fhirAddress.setState(openmrsAddress.getState());
-            fhirAddress.setDistrict(openmrsAddress.getDistrict());
-            fhirAddress.setCountry(openmrsAddress.getCountry());
-            fhirAddress.setPostalCode(openmrsAddress.getPostalCode());
-        }
-        fhirOrg.setActive(openmrsOrg.getActive());
-        for (Concept concept : openmrsOrg.getType()) {
-            fhirOrg.addType(conceptTranslator.toFhirResource(concept));
-        }
-        
-        if (openmrsOrg.getPartOfOrg() != null) {
-            fhirOrg.setPartOf(new Reference(ResourceType.Organization + "/" + openmrsOrg.getPartOfOrg().getUuid()));
-        }
-        
-        // add the mCSD ext http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension 
-        if (openmrsOrg.getMcsdPartOfOrg() != null) {
-            Extension mcsdExt = fhirOrg.addExtension();
-            mcsdExt.setUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL);
-            
-            Reference reference = new Reference(ResourceType.Organization + "/" + openmrsOrg.getMcsdPartOfOrg().getUuid());
-            
-            Extension partOfExt = mcsdExt.addExtension();
-            partOfExt.setUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
-            partOfExt.setValue(reference);
-            
-            if (openmrsOrg.getMcsdHierarchyType() != null) {
-                Extension hierarchyTypeExt = mcsdExt.addExtension();
-                hierarchyTypeExt.setUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_HIERACHY_TYPE);
-                hierarchyTypeExt.setValue(conceptTranslator.toFhirResource(openmrsOrg.getMcsdHierarchyType()));
-            }
-            
-            fhirOrg.getMeta().setLastUpdated(openmrsOrg.getDateChanged());
-            
-        }
-        return fhirOrg;
-    }
-    
-    @Override
-    public FhirOrganization toOpenmrsType(Organization fhirOrganization) {
-        notNull(fhirOrganization, "The Organization object should not be null");
-        return toOpenmrsType(new FhirOrganization(), fhirOrganization);
-    }
-    
-    @Override
-    public FhirOrganization toOpenmrsType(FhirOrganization openmrsOrg, Organization fhirOrg) {
-        notNull(fhirOrg, "The Organization object should not be null");
-        notNull(openmrsOrg, "The existing Organization object should not be null");
-        
-        openmrsOrg.setUuid(fhirOrg.getIdElement().getIdPart());
-        openmrsOrg.setName(fhirOrg.getName());
-        openmrsOrg.setActive(fhirOrg.getActive());
-        for (CodeableConcept code : fhirOrg.getType()) {
-            openmrsOrg.addType(conceptTranslator.toOpenmrsType(code));
-        }
-        
-        for (Address fhirAddress : fhirOrg.getAddress()) {
-            FhirOganizationAddress openmrsAddress = new FhirOganizationAddress();
-            openmrsAddress.setCity(fhirAddress.getCity());
-            openmrsAddress.setState(fhirAddress.getState());
-            openmrsAddress.setDistrict(fhirAddress.getDistrict());
-            openmrsAddress.setCountry(fhirAddress.getCountry());
-            openmrsAddress.setPostalCode(fhirAddress.getPostalCode());
-            openmrsOrg.addAddress(openmrsAddress);
-        }
-        
-        if (fhirOrg.hasPartOf()) {
-            openmrsOrg.setPartOfOrg(getPartOfOrg(fhirOrg.getPartOf()));
-        }
-        
-        if (fhirOrg.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL)) {
-            Extension mcsdExt = fhirOrg.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL);
-            if (mcsdExt.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF)) {
-                Extension extParOf = mcsdExt.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
-                Type referenceOrgType = extParOf.getValue();
-                if (referenceOrgType instanceof Reference) {
-                    Reference reference = (Reference) referenceOrgType;
-                    openmrsOrg.setMcsdPartOfOrg(getPartOfOrg(reference));
-                }
-            }
-            
-            if (mcsdExt.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL_HIERACHY_TYPE)) {
-                Extension extHierachyType = mcsdExt
-                        .getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_HIERACHY_TYPE);
-                Type codeableType = extHierachyType.getValue();
-                if (codeableType instanceof CodeableConcept) {
-                    CodeableConcept code = (CodeableConcept) codeableType;
-                    openmrsOrg.setMcsdHierarchyType(conceptTranslator.toOpenmrsType(code));
-                }
-            }
-            
-        }
-        return openmrsOrg;
-    }
-    
-    private FhirOrganization getPartOfOrg(Reference organization) {
-        if (organization == null) {
-            return null;
-        }
-        
-        if (organization.hasType() && !organization.getType().equals(ResourceType.Organization.toString())) {
-            throw new IllegalArgumentException("Reference must be to Organization not a " + organization.getType());
-        }
-        
-        return getReferenceId(organization).map(uuid -> fhirOrganizationDao.get(uuid)).orElse(null);
-    }
-    
+	
+	@Autowired
+	@Qualifier("adminService")
+	private AdministrationService administrationService;
+	
+	@Autowired
+	private ConceptTranslator conceptTranslator;
+	
+	@Autowired
+	private FhirOrganizationDao fhirOrganizationDao;
+	
+	@Override
+	public Organization toFhirResource(@Nonnull FhirOrganization openmrsOrg) {
+		notNull(openmrsOrg, "The Openmrs Fhir Organization object should not be null");
+		Organization fhirOrg = new Organization();
+		fhirOrg.setId(openmrsOrg.getUuid());
+		fhirOrg.setName(openmrsOrg.getName());
+		Identifier identifier = fhirOrg.addIdentifier();
+		identifier.setSystem(
+		    administrationService.getGlobalProperty(FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM,
+		        "http://fhir.openmrs.org/organization/identifier")).setValue(openmrsOrg.getUuid());
+		for (FhirOganizationAddress openmrsAddress : openmrsOrg.getAddress()) {
+			Address fhirAddress = fhirOrg.addAddress();
+			fhirAddress.setCity(openmrsAddress.getCity());
+			fhirAddress.setState(openmrsAddress.getState());
+			fhirAddress.setDistrict(openmrsAddress.getDistrict());
+			fhirAddress.setCountry(openmrsAddress.getCountry());
+			fhirAddress.setPostalCode(openmrsAddress.getPostalCode());
+		}
+		fhirOrg.setActive(openmrsOrg.getActive());
+		for (Concept concept : openmrsOrg.getType()) {
+			fhirOrg.addType(conceptTranslator.toFhirResource(concept));
+		}
+		
+		if (openmrsOrg.getPartOfOrg() != null) {
+			fhirOrg.setPartOf(new Reference(ResourceType.Organization + "/" + openmrsOrg.getPartOfOrg().getUuid()));
+		}
+		
+		// add the mCSD ext http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension 
+		if (openmrsOrg.getMcsdPartOfOrg() != null) {
+			Extension mcsdExt = fhirOrg.addExtension();
+			mcsdExt.setUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL);
+			
+			Reference reference = new Reference(ResourceType.Organization + "/" + openmrsOrg.getMcsdPartOfOrg().getUuid());
+			
+			Extension partOfExt = mcsdExt.addExtension();
+			partOfExt.setUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
+			partOfExt.setValue(reference);
+			
+			if (openmrsOrg.getMcsdHierarchyType() != null) {
+				Extension hierarchyTypeExt = mcsdExt.addExtension();
+				hierarchyTypeExt.setUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_HIERACHY_TYPE);
+				hierarchyTypeExt.setValue(conceptTranslator.toFhirResource(openmrsOrg.getMcsdHierarchyType()));
+			}
+			
+			fhirOrg.getMeta().setLastUpdated(openmrsOrg.getDateChanged());
+			
+		}
+		return fhirOrg;
+	}
+	
+	@Override
+	public FhirOrganization toOpenmrsType(Organization fhirOrganization) {
+		notNull(fhirOrganization, "The Organization object should not be null");
+		return toOpenmrsType(new FhirOrganization(), fhirOrganization);
+	}
+	
+	@Override
+	public FhirOrganization toOpenmrsType(FhirOrganization openmrsOrg, Organization fhirOrg) {
+		notNull(fhirOrg, "The Organization object should not be null");
+		notNull(openmrsOrg, "The existing Organization object should not be null");
+		
+		openmrsOrg.setUuid(fhirOrg.getIdElement().getIdPart());
+		openmrsOrg.setName(fhirOrg.getName());
+		openmrsOrg.setActive(fhirOrg.getActive());
+		for (CodeableConcept code : fhirOrg.getType()) {
+			openmrsOrg.addType(conceptTranslator.toOpenmrsType(code));
+		}
+		
+		for (Address fhirAddress : fhirOrg.getAddress()) {
+			FhirOganizationAddress openmrsAddress = new FhirOganizationAddress();
+			openmrsAddress.setCity(fhirAddress.getCity());
+			openmrsAddress.setState(fhirAddress.getState());
+			openmrsAddress.setDistrict(fhirAddress.getDistrict());
+			openmrsAddress.setCountry(fhirAddress.getCountry());
+			openmrsAddress.setPostalCode(fhirAddress.getPostalCode());
+			openmrsOrg.addAddress(openmrsAddress);
+		}
+		
+		if (fhirOrg.hasPartOf()) {
+			openmrsOrg.setPartOfOrg(getPartOfOrg(fhirOrg.getPartOf()));
+		}
+		
+		if (fhirOrg.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL)) {
+			Extension mcsdExt = fhirOrg.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL);
+			if (mcsdExt.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF)) {
+				Extension extParOf = mcsdExt.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
+				Type referenceOrgType = extParOf.getValue();
+				if (referenceOrgType instanceof Reference) {
+					Reference reference = (Reference) referenceOrgType;
+					openmrsOrg.setMcsdPartOfOrg(getPartOfOrg(reference));
+				}
+			}
+			
+			if (mcsdExt.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL_HIERACHY_TYPE)) {
+				Extension extHierachyType = mcsdExt
+				        .getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_HIERACHY_TYPE);
+				Type codeableType = extHierachyType.getValue();
+				if (codeableType instanceof CodeableConcept) {
+					CodeableConcept code = (CodeableConcept) codeableType;
+					openmrsOrg.setMcsdHierarchyType(conceptTranslator.toOpenmrsType(code));
+				}
+			}
+			
+		}
+		return openmrsOrg;
+	}
+	
+	private FhirOrganization getPartOfOrg(Reference organization) {
+		if (organization == null) {
+			return null;
+		}
+		
+		if (organization.hasType() && !organization.getType().equals(ResourceType.Organization.toString())) {
+			throw new IllegalArgumentException("Reference must be to Organization not a " + organization.getType());
+		}
+		
+		return getReferenceId(organization).map(uuid -> fhirOrganizationDao.get(uuid)).orElse(null);
+	}
 }
