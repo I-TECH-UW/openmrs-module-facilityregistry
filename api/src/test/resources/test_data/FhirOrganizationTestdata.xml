@@ -21,8 +21,8 @@
     <fhir_organization organization_id="1" name="Parent OpenMRS org" active="true"   creator="1" date_created="2008-08-18 14:09:35.0" changed_by="1" date_changed="2018-08-18 14:09:35.0" voided="false" uuid="cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5AA"/>
 	<fhir_organization organization_id="2" name="mCSD OpenMRS org" active="true"   creator="1" date_created="2008-08-18 14:09:35.0" changed_by="1" date_changed="2018-08-18 14:09:35.0" voided="false" uuid="cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5BB"/>
 	<fhir_organization organization_id="3" name="OpenMRS org" active="true" partof_org_id="1" mcsd_partof_org_id="2" mcsd_hierachy_concept_id="5085" creator="1" date_created="2008-08-18 14:09:35.0" changed_by="1" date_changed="2018-08-18 14:09:35.0" voided="false" uuid="cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5CC"/>
-    <fhir_organization_address organization_address_id="1"  name="Test address"  city="kampala" state="Buganda" district="Luweero" country="Uganda" postal_code="4069-3100"  creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="dc80983f-8b2c-4524-bdbd-b5e825e263DD"/>
-    <fhir_organization_address organization_address_id="2"  name="Test address2"  city="kampala2" state="Buganda2" district="Luweero2" country="Uganda2" postal_code="4069-31002"  creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="dc80983f-8b2c-4524-bdbd-b5e825e263EE"/>
+    <fhir_organization_address organization_address_id="1"  city="kampala" state="Buganda" district="Luweero" country="Uganda" postal_code="4069-3100"  creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="dc80983f-8b2c-4524-bdbd-b5e825e263DD"/>
+    <fhir_organization_address organization_address_id="2"  city="kampala2" state="Buganda2" district="Luweero2" country="Uganda2" postal_code="4069-31002"  creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="dc80983f-8b2c-4524-bdbd-b5e825e263EE"/>
     <fhir_organization_type organization_id="3" concept_id="5085" />
 	<fhir_organization_addresses organization_id="3" organization_address_id="1" />
     <fhir_organization_addresses organization_id="3" organization_address_id="2" />

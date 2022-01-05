@@ -9,29 +9,22 @@
  */
 package org.openmrs.module.facilityregistry.providers.r4;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-import org.openmrs.module.facilityregistry.providers.r4.OrganizationFhirResourceProvider;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import org.openmrs.module.fhir2.providers.r4.BaseFhirR4IntegrationTest;
 
-import java.math.BigDecimal;
+import java.util.Objects;
+import org.apache.commons.io.IOUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +34,11 @@ public class OrganizationFhirResourceProviderIntegrationTest extends BaseFhirR4I
 	
 	private static final String ORGANIZATION_INITIAL_DATA_XML = "test_data/FhirOrganizationTestdata.xml";
 	
+	private static final String JSON_ORGANIZATION = "test_data/organization.json";
+	
 	private static final String ORGANIZATION_UUID = "cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5CC";
+	
+	private static final String UNKNOWN_ORGANIZATION_UUID = "8516d594-9c31-4bd3-bfec-b42b2f8a8444";
 	
 	@Autowired
 	@Getter(AccessLevel.PUBLIC)
@@ -58,7 +55,76 @@ public class OrganizationFhirResourceProviderIntegrationTest extends BaseFhirR4I
 	public void shouldReturnExistingOrganizationAsJson() throws Exception {
 		MockHttpServletResponse response = get("/Organization/" + ORGANIZATION_UUID).accept(FhirMediaTypes.JSON).go();
 		
-		//assertThat(response, isOk());
+		assertThat(response, isOk());
+		assertThat(response.getContentType(), is(FhirMediaTypes.JSON.toString()));
+		assertThat(response.getContentAsString(), notNullValue());
+		
+		Organization org = readResponse(response);
+		
+		assertThat(org, notNullValue());
+		assertThat(org.getIdElement().getIdPart(), equalTo(ORGANIZATION_UUID));
+		assertThat(org, validResource());
 	}
 	
+	@Test
+	public void shouldThrow404ForNonExistingOrganizationAsJson() throws Exception {
+		MockHttpServletResponse response = get("/Organization/" + UNKNOWN_ORGANIZATION_UUID).accept(FhirMediaTypes.JSON)
+		        .go();
+		
+		assertThat(response, isNotFound());
+		assertThat(response.getContentType(), is(FhirMediaTypes.JSON.toString()));
+		assertThat(response.getContentAsString(), notNullValue());
+		
+		OperationOutcome operationOutcome = readOperationOutcome(response);
+		
+		assertThat(operationOutcome, notNullValue());
+		assertThat(operationOutcome.hasIssue(), is(true));
+	}
+	
+	@Test
+	public void shouldReturnExistingLocationAsXML() throws Exception {
+		MockHttpServletResponse response = get("/Organization/" + ORGANIZATION_UUID).accept(FhirMediaTypes.XML).go();
+		
+		assertThat(response, isOk());
+		assertThat(response.getContentType(), is(FhirMediaTypes.XML.toString()));
+		assertThat(response.getContentAsString(), notNullValue());
+		
+		Organization org = readResponse(response);
+		
+		assertThat(org, notNullValue());
+		assertThat(org.getIdElement().getIdPart(), equalTo(ORGANIZATION_UUID));
+		assertThat(org, validResource());
+	}
+	
+	@Test
+	public void shouldCreateNewOrganozationAsJson() throws Exception {
+		// read JSON record
+		String jsonOrg;
+		try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(JSON_ORGANIZATION)) {
+			Objects.requireNonNull(is);
+			jsonOrg = IOUtils.toString(is, StandardCharsets.UTF_8);
+		}
+		
+		// create Organization
+		MockHttpServletResponse response = post("/Organization").accept(FhirMediaTypes.JSON).jsonContent(jsonOrg).go();
+		
+		// verify created correctly
+		assertThat(response, isCreated());
+		assertThat(response.getContentType(), is(FhirMediaTypes.JSON.toString()));
+		assertThat(response.getContentAsString(), notNullValue());
+		
+		Organization org = readResponse(response);
+		
+		assertThat(org, notNullValue());
+		assertThat(org.getName(), equalTo("Test Org"));
+		assertThat(org, validResource());
+		
+		response = get("/Organization/" + org.getIdElement().getIdPart()).accept(FhirMediaTypes.JSON).go();
+		
+		assertThat(response, isOk());
+		
+		Organization newOrg = readResponse(response);
+		
+		assertThat(newOrg.getId(), equalTo(org.getId()));
+	}
 }

@@ -60,7 +60,6 @@ public class FhirOrganizationDaoImplTest extends BaseModuleContextSensitiveTest 
 	public void saveOrUpdate_shouldSaveNewFhirOrganization() {
 		FhirOganizationAddress add1 = new FhirOganizationAddress();
 		add1.setId(3);
-		add1.setName("add1");
 		add1.setCity("kla");
 		add1.setState("Buganda");
 		add1.setDistrict("Luweero");
@@ -68,7 +67,6 @@ public class FhirOrganizationDaoImplTest extends BaseModuleContextSensitiveTest 
 		
 		FhirOganizationAddress add2 = new FhirOganizationAddress();
 		add2.setId(4);
-		add2.setName("add2");
 		add2.setCity("kla2");
 		add2.setState("Buganda2");
 		add2.setDistrict("Luweero2");

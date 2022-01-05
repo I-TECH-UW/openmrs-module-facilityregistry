@@ -50,7 +50,7 @@
 			<column name="mcsd_partof_org_id" type="int"/>
 			<column name="mcsd_hierachy_concept_id" type="int"/>
 			<column name="name" type="varchar(64)">
-				<constraints nullable="true" ></constraints>
+				<constraints nullable="false" ></constraints>
 			</column> 
 			 <column name="creator" type="int">
                 <constraints nullable="false"/>
@@ -132,10 +132,6 @@
 			<column name="district" type="varchar(255)"/>
 		    <column name="country" type="varchar(255)"/>
 		    <column name="postal_code" type="varchar(255)"/>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(255)"/>
             <column name="creator" type="int">
                 <constraints nullable="false"/>
             </column>
