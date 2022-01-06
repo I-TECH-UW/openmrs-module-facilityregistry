@@ -163,11 +163,9 @@ public class OrganizationTranslatorImpl extends BaseReferenceHandlingTranslator 
 		if (organization == null) {
 			return null;
 		}
-		
 		if (organization.hasType() && !organization.getType().equals(ResourceType.Organization.toString())) {
 			throw new IllegalArgumentException("Reference must be to Organization not a " + organization.getType());
 		}
-		
 		return getReferenceId(organization).map(uuid -> fhirOrganizationDao.get(uuid)).orElse(null);
 	}
 }
