@@ -79,7 +79,7 @@
                                  baseTableName="fhir_organization" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
 		<addForeignKeyConstraint constraintName="fhir_organization_hierachy_concept_fk"
-                                 baseTableName="fhir_organization" baseColumnNames="concept_id"
+                                 baseTableName="fhir_organization" baseColumnNames="mcsd_hierachy_concept_id"
                                  referencedTableName="concept" referencedColumnNames="concept_id"/>
 	</changeSet>
 	<changeSet id="facilityregistry-3" author="mosesmutesa">
