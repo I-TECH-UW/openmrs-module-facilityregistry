@@ -54,13 +54,11 @@ public class OrganizationFhirResourceProviderIntegrationTest extends BaseFhirR4I
 	@Test
 	public void shouldReturnExistingOrganizationAsJson() throws Exception {
 		MockHttpServletResponse response = get("/Organization/" + ORGANIZATION_UUID).accept(FhirMediaTypes.JSON).go();
-		
 		assertThat(response, isOk());
 		assertThat(response.getContentType(), is(FhirMediaTypes.JSON.toString()));
 		assertThat(response.getContentAsString(), notNullValue());
 		
 		Organization org = readResponse(response);
-		
 		assertThat(org, notNullValue());
 		assertThat(org.getIdElement().getIdPart(), equalTo(ORGANIZATION_UUID));
 		assertThat(org, validResource());
@@ -70,13 +68,11 @@ public class OrganizationFhirResourceProviderIntegrationTest extends BaseFhirR4I
 	public void shouldThrow404ForNonExistingOrganizationAsJson() throws Exception {
 		MockHttpServletResponse response = get("/Organization/" + UNKNOWN_ORGANIZATION_UUID).accept(FhirMediaTypes.JSON)
 		        .go();
-		
 		assertThat(response, isNotFound());
 		assertThat(response.getContentType(), is(FhirMediaTypes.JSON.toString()));
 		assertThat(response.getContentAsString(), notNullValue());
 		
 		OperationOutcome operationOutcome = readOperationOutcome(response);
-		
 		assertThat(operationOutcome, notNullValue());
 		assertThat(operationOutcome.hasIssue(), is(true));
 	}
@@ -84,13 +80,11 @@ public class OrganizationFhirResourceProviderIntegrationTest extends BaseFhirR4I
 	@Test
 	public void shouldReturnExistingLocationAsXML() throws Exception {
 		MockHttpServletResponse response = get("/Organization/" + ORGANIZATION_UUID).accept(FhirMediaTypes.XML).go();
-		
 		assertThat(response, isOk());
 		assertThat(response.getContentType(), is(FhirMediaTypes.XML.toString()));
 		assertThat(response.getContentAsString(), notNullValue());
 		
 		Organization org = readResponse(response);
-		
 		assertThat(org, notNullValue());
 		assertThat(org.getIdElement().getIdPart(), equalTo(ORGANIZATION_UUID));
 		assertThat(org, validResource());
@@ -104,27 +98,20 @@ public class OrganizationFhirResourceProviderIntegrationTest extends BaseFhirR4I
 			Objects.requireNonNull(is);
 			jsonOrg = IOUtils.toString(is, StandardCharsets.UTF_8);
 		}
-		
 		// create Organization
 		MockHttpServletResponse response = post("/Organization").accept(FhirMediaTypes.JSON).jsonContent(jsonOrg).go();
-		
 		// verify created correctly
 		assertThat(response, isCreated());
 		assertThat(response.getContentType(), is(FhirMediaTypes.JSON.toString()));
 		assertThat(response.getContentAsString(), notNullValue());
-		
 		Organization org = readResponse(response);
-		
 		assertThat(org, notNullValue());
 		assertThat(org.getName(), equalTo("Test Org"));
 		assertThat(org, validResource());
 		
 		response = get("/Organization/" + org.getIdElement().getIdPart()).accept(FhirMediaTypes.JSON).go();
-		
 		assertThat(response, isOk());
-		
 		Organization newOrg = readResponse(response);
-		
 		assertThat(newOrg.getId(), equalTo(org.getId()));
 	}
 }

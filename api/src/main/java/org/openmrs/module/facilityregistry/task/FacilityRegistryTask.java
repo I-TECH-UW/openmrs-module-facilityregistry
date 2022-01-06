@@ -169,13 +169,17 @@ public class FacilityRegistryTask extends AbstractTask {
 							Organization mcsdReferenceOrg = getFhirClient().read().resource(Organization.class)
 							        .withId(referenceOrgId).encodedJson().execute();
 							saveOrUpdateOrganization(mcsdReferenceOrg);
+							// save the mcsd reference Organization as a location
+							Location mcsdreferenceLocation = convertOrganisationToLocation(mcsdReferenceOrg);
+							saveOrUpdateLocation(mcsdreferenceLocation);
+							
 						}
 					}
 					if (organization.hasPartOf()) {
 						String parentOrgId = organization.getPartOf().getReference();
-						Organization parentOrg = getFhirClient().read().resource(Organization.class).withId(parentOrgId)
+						Organization partOfOrg = getFhirClient().read().resource(Organization.class).withId(parentOrgId)
 						        .encodedJson().execute();
-						saveOrUpdateOrganization(parentOrg);
+						saveOrUpdateOrganization(partOfOrg);
 						
 					}
 					saveOrUpdateOrganization(organization);
@@ -221,6 +225,28 @@ public class FacilityRegistryTask extends AbstractTask {
 			log.debug("Updated Organization Resource with ID " + newOrganization.getIdElement().getIdPart());
 		}
 		
+	}
+	
+	/**
+	 * Converts mcsd Organisation to Location to be persisted by the Fhir Location Service
+	 * 
+	 * @param organisation Organisation to be converted
+	 * @return converted Location
+	 */
+	private Location convertOrganisationToLocation(Organization organisation) {
+		Location orgLocation = new Location();
+		orgLocation.setId(organisation.getIdElement().getIdPart());
+		orgLocation.setName(organisation.getName());
+		orgLocation.setDescription(organisation.getName());
+		orgLocation.setAddress(organisation.getAddressFirstRep());
+		orgLocation.setStatus(LocationStatus.ACTIVE);
+		orgLocation.setType(organisation.getType());
+		orgLocation.setIdentifier(organisation.getIdentifier());
+		// tag the Organisation from Facility Registry as mCSD_Organisation
+		orgLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM,
+		    FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION,
+		    FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION);
+		return orgLocation;
 	}
 	
 }

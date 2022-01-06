@@ -29,8 +29,6 @@ public class FacilityRegistryConstants {
 	
 	public static final String FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM = "http://facilityRegistry/mcsd.organisation";
 	
-	public static final String FACILITY_REGISTRY_ORGANISATION_NAME_PREFIX = "mCSD_";
-	
 	public static final String MCSD_EXTENTION_URL = "http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension";
 	
 	public static final String MCSD_EXTENTION_URL_PART_OF = "part-of";

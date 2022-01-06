@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
- 
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
- 
-    <!--
+	<!--
     	See http://wiki.openmrs.org/display/docs/Module+liquibase+File for 
     	documentation on this file.
     
         See http://www.liquibase.org/manual/home#available_database_refactorings
         for a list of supported elements and attributes
     -->
- 
 	<changeSet id="facilityregistry-1" author="mosesmutesa" >
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
@@ -33,167 +31,162 @@
 			<column name="uuid" value="0c5a0540-48af-11ec-81d3-0242ac130003" />
 		</insert>
 	</changeSet>
-     <changeSet id="facilityregistry-2" author="mosesmutesa">
+	<changeSet id="facilityregistry-2" author="mosesmutesa">
 		<preConditions onFail="MARK_RAN">
-			<not><tableExists tableName="fhir_organization"/></not>
+			<not>
+				<tableExists tableName="fhir_organization"/>
+			</not>
 		</preConditions>
 		<comment>
 			Creating fhir_organization table
 		</comment>
-		
 		<createTable tableName="fhir_organization">
 			<column name="organization_id" type="int" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
-			</column>								      
+			</column>
 			<column name="active" type="boolean"/>
 			<column name="partof_org_id" type="int"/>
 			<column name="mcsd_partof_org_id" type="int"/>
 			<column name="mcsd_hierachy_concept_id" type="int"/>
 			<column name="name" type="varchar(64)">
 				<constraints nullable="false" ></constraints>
-			</column> 
-			 <column name="creator" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="date_created" type="datetime">
-                <constraints nullable="false"/>
-            </column>
-            <column name="changed_by" type="int"/>
-            <column name="date_changed" type="datetime"/>
-            <column name="voided" type="boolean" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="voided_by" type="int"/>
-            <column name="date_voided" type="datetime"/>
-            <column name="void_reason" type="varchar(255)" defaultValue="null"/>
-            <column name="uuid" type="char(38)">
-                <constraints nullable="false" unique="true"/>
-            </column>	
-		</createTable>	
-		   <addForeignKeyConstraint constraintName="fhir_organization_creator_fk"
+			</column>
+			<column name="creator" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date_created" type="datetime">
+				<constraints nullable="false"/>
+			</column>
+			<column name="changed_by" type="int"/>
+			<column name="date_changed" type="datetime"/>
+			<column name="voided" type="boolean" defaultValueBoolean="false">
+				<constraints nullable="false"/>
+			</column>
+			<column name="voided_by" type="int"/>
+			<column name="date_voided" type="datetime"/>
+			<column name="void_reason" type="varchar(255)" defaultValue="null"/>
+			<column name="uuid" type="char(38)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fhir_organization_creator_fk"
                                  baseTableName="fhir_organization" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="fhir_organization_changed_by_fk"
+		<addForeignKeyConstraint constraintName="fhir_organization_changed_by_fk"
                                  baseTableName="fhir_organization" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="fhir_organization_voided_by_fk"
+		<addForeignKeyConstraint constraintName="fhir_organization_voided_by_fk"
                                  baseTableName="fhir_organization" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="fhir_organization_hierachy_concept_fk"
+		<addForeignKeyConstraint constraintName="fhir_organization_hierachy_concept_fk"
                                  baseTableName="fhir_organization" baseColumnNames="concept_id"
                                  referencedTableName="concept" referencedColumnNames="concept_id"/>
-    </changeSet>
-
-
-	 <changeSet id="facilityregistry-3" author="mosesmutesa">
-        <preConditions onFail="MARK_RAN" onError="WARN">
-            <not>
-                <tableExists tableName="fhir_organization_type"/>
-            </not>
-        </preConditions>
+	</changeSet>
+	<changeSet id="facilityregistry-3" author="mosesmutesa">
+		<preConditions onFail="MARK_RAN" onError="WARN">
+			<not>
+				<tableExists tableName="fhir_organization_type"/>
+			</not>
+		</preConditions>
 		<comment>
 			Creating the fhir_organization_type table
 		</comment>
-        <createTable tableName="fhir_organization_type">
-            <column name="organization_id" type="int">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="concept_id" type="int">
-                <constraints primaryKey="true"/>
-            </column>
-        </createTable>
-        <addForeignKeyConstraint constraintName="fhir_organization_type_org_fk"
+		<createTable tableName="fhir_organization_type">
+			<column name="organization_id" type="int">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="concept_id" type="int">
+				<constraints primaryKey="true"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fhir_organization_type_org_fk"
                                  baseTableName="fhir_organization_type" 
 								 baseColumnNames="organization_id"
                                  referencedTableName="fhir_organization"
                                  referencedColumnNames="organization_id"/>
-        <addForeignKeyConstraint constraintName="fhir_organization_type_concept_fk"
+		<addForeignKeyConstraint constraintName="fhir_organization_type_concept_fk"
                                  baseTableName="fhir_organization_type" 
 								 baseColumnNames="concept_id"
                                  referencedTableName="concept"
                                  referencedColumnNames="concept_id"/>
-    </changeSet>
-
-	  <changeSet id="facilityregistry-4" author="mosesmutesa">
-        <preConditions onFail="MARK_RAN" onError="WARN">
-            <not>
-                <tableExists tableName="fhir_organization_address"/>
-            </not>
-        </preConditions>
+	</changeSet>
+	<changeSet id="facilityregistry-4" author="mosesmutesa">
+		<preConditions onFail="MARK_RAN" onError="WARN">
+			<not>
+				<tableExists tableName="fhir_organization_address"/>
+			</not>
+		</preConditions>
 		<comment>
 			Creating the fhir_organization_address table
 		</comment>
-        <createTable tableName="fhir_organization_address">
-            <column name="organization_address_id" type="int" autoIncrement="true">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="city" type="varchar(255)"/>
+		<createTable tableName="fhir_organization_address">
+			<column name="organization_address_id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="city" type="varchar(255)"/>
 			<column name="state" type="varchar(255)"/>
 			<column name="district" type="varchar(255)"/>
-		    <column name="country" type="varchar(255)"/>
-		    <column name="postal_code" type="varchar(255)"/>
-            <column name="creator" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="date_created" type="datetime">
-                <constraints nullable="false"/>
-            </column>
-            <column name="changed_by" type="int"/>
-            <column name="date_changed" type="datetime"/>
-            <column name="retired" type="boolean" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="retired_by" type="int"/>
-            <column name="date_retired" type="datetime"/>
-            <column name="retire_reason" type="varchar(255)" defaultValue="null"/>
-            <column name="uuid" type="varchar(38)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-        </createTable>
-        <addForeignKeyConstraint baseTableName="fhir_organization_address" 
+			<column name="country" type="varchar(255)"/>
+			<column name="postal_code" type="varchar(255)"/>
+			<column name="creator" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="date_created" type="datetime">
+				<constraints nullable="false"/>
+			</column>
+			<column name="changed_by" type="int"/>
+			<column name="date_changed" type="datetime"/>
+			<column name="retired" type="boolean" defaultValueBoolean="false">
+				<constraints nullable="false"/>
+			</column>
+			<column name="retired_by" type="int"/>
+			<column name="date_retired" type="datetime"/>
+			<column name="retire_reason" type="varchar(255)" defaultValue="null"/>
+			<column name="uuid" type="varchar(38)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint baseTableName="fhir_organization_address" 
 		                         baseColumnNames="creator"
                                  constraintName="fhir_organization_address_creator_fk"
                                  referencedTableName="users" 
 								 referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint baseTableName="fhir_organization_address"
+		<addForeignKeyConstraint baseTableName="fhir_organization_address"
 		                         baseColumnNames="changed_by"
                                  constraintName="fhir_organization_address_changed_by_fk"
                                  referencedTableName="users" 
 								referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint baseTableName="fhir_organization_address" 
+		<addForeignKeyConstraint baseTableName="fhir_organization_address" 
 		                         baseColumnNames="retired_by"
                                  constraintName="fhir_organization_address_retired_by_fk"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-    </changeSet>
-
-	 <changeSet id="facilityregistry-5" author="mosesmutesa">
-        <preConditions onFail="MARK_RAN" onError="WARN">
-            <not>
-                <tableExists tableName="fhir_organization_addresses"/>
-            </not>
-        </preConditions>
+	</changeSet>
+	<changeSet id="facilityregistry-5" author="mosesmutesa">
+		<preConditions onFail="MARK_RAN" onError="WARN">
+			<not>
+				<tableExists tableName="fhir_organization_addresses"/>
+			</not>
+		</preConditions>
 		<comment>
 			Creating the fhir_organization_addresses table
 		</comment>
-        <createTable tableName="fhir_organization_addresses">
-            <column name="organization_id" type="int">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="organization_address_id" type="int">
-                <constraints primaryKey="true"/>
-            </column>
-        </createTable>
-        <addForeignKeyConstraint constraintName="fhir_organization_address_org_fk"
+		<createTable tableName="fhir_organization_addresses">
+			<column name="organization_id" type="int">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="organization_address_id" type="int">
+				<constraints primaryKey="true"/>
+			</column>
+		</createTable>
+		<addForeignKeyConstraint constraintName="fhir_organization_address_org_fk"
                                  baseTableName="fhir_organization_addresses" 
 								 baseColumnNames="organization_id"
                                  referencedTableName="fhir_organization"
                                  referencedColumnNames="organization_id"/>
-        <addForeignKeyConstraint constraintName="fhir_organization_address_fk"
+		<addForeignKeyConstraint constraintName="fhir_organization_address_fk"
                                  baseTableName="fhir_organization_addresses" 
 								 baseColumnNames="organization_address_id"
                                  referencedTableName="fhir_organization_address"
                                  referencedColumnNames="organization_address_id"/>
-    </changeSet>
-
- 
+	</changeSet>
 </databaseChangeLog>
