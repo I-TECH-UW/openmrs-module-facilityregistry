@@ -1,0 +1,78 @@
+{
+    "resourceType": "Organization",
+    "id": "cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5XX",
+    "meta": {
+      "lastUpdated": "2018-08-18T14:09:35.000+03:00"
+    },
+    "extension": [
+      {
+        "url": "http://ihe.net/fhir/StructureDefinition/IHE.mCSD.hierarchy.extension",
+        "extension": [
+          {
+            "url": "part-of",
+            "valueReference": {
+              "reference": "Organization/cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5BB"
+            }
+          },
+          {
+            "url": "hierarchy-type",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "code": "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                  "display": "FHIR Diagnostic Service Section Codes"
+                },
+                {
+                  "system": "https://openconceptlab.org/orgs/CIEL/sources/CIEL",
+                  "code": "5085",
+                  "display": "FHIR Diagnostic Service Section Codes"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "identifier": [
+      {
+        "system": "http://fhir.openmrs.org/organization/identifier",
+        "value": "cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5CC"
+      }
+    ],
+    "active": true,
+    "type": [
+      {
+        "coding": [
+          {
+            "code": "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "display": "FHIR Diagnostic Service Section Codes"
+          },
+          {
+            "system": "https://openconceptlab.org/orgs/CIEL/sources/CIEL",
+            "code": "5085",
+            "display": "FHIR Diagnostic Service Section Codes"
+          }
+        ]
+      }
+    ],
+    "name": "Test Org",
+    "address": [
+      {
+        "city": "kampala",
+        "district": "Luweero",
+        "state": "Buganda",
+        "postalCode": "4069-3100",
+        "country": "Uganda"
+      },
+      {
+        "city": "kampala2",
+        "district": "Luweero2",
+        "state": "Buganda2",
+        "postalCode": "4069-31002",
+        "country": "Uganda2"
+      }
+    ],
+    "partOf": {
+      "reference": "Organization/cf9b1f44-0e8f-42f1-900b-bf1c5d4ed5AA"
+    }
+  }
