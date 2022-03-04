@@ -10,12 +10,16 @@
 package org.openmrs.module.facilityregistry.task;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Objects;
 
 import org.openmrs.api.AdministrationService;
 import org.openmrs.scheduler.tasks.AbstractTask;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -31,7 +35,6 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Location.LocationStatus;
 import org.openmrs.api.context.Context;
-import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.facilityregistry.FacilityRegistryConstants;
 import org.openmrs.module.facilityregistry.api.FhirOrganizationService;
 import org.openmrs.module.facilityregistry.utils.FhirUtils;
@@ -43,14 +46,32 @@ import org.slf4j.LoggerFactory;
 /**
  * A scheduled task that automatically poll data from a Facility Registry Server ie GOFR
  */
-public class FacilityRegistryTask extends AbstractTask {
+@Component
+public class FacilityRegistryTask extends AbstractTask implements ApplicationContextAware {
 	
 	private static final Logger log = LoggerFactory.getLogger(FacilityRegistryTask.class);
 	
+	private static ApplicationContext applicationContext;
+	
+	@Autowired
+	@Qualifier("adminService")
 	private AdministrationService administrationService;
+	
+	@Autowired
+	private FhirLocationService locationService;
+	
+	@Autowired
+	FhirOrganizationService organizationService;
 	
 	@Override
 	public void execute() {
+		
+		try {
+			applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
+		}
+		catch (Exception e) {
+			// return;
+		}
 		Bundle searchBundle;
 		try {
 			log.info("executing FacilityRegistryTask");
@@ -63,7 +84,7 @@ public class FacilityRegistryTask extends AbstractTask {
 				saveFhirLocation(searchBundle);
 			}
 		}
-		catch (Exception e) {
+		catch (IOException e) {
 			log.error(e.getMessage());
 		}
 		
@@ -89,56 +110,6 @@ public class FacilityRegistryTask extends AbstractTask {
 		log.info("generating Bearer Token");
 		log.debug(token);
 		return FhirUtils.getFhirClient(fhirStorePath, token);
-	}
-	
-	/**
-	 * Loads the FHIR2 FhirLocationService from the Application Context
-	 * 
-	 * @return FhirLocationService
-	 */
-	private FhirLocationService getFhirLocationService() {
-		try {
-			Field serviceContextField = Context.class.getDeclaredField("serviceContext");
-			serviceContextField.setAccessible(true);
-			FhirLocationService locationService;
-			try {
-				ApplicationContext applicationContext = ((ServiceContext) serviceContextField.get(null))
-				        .getApplicationContext();
-				locationService = applicationContext.getBean(FhirLocationService.class);
-			}
-			finally {
-				serviceContextField.setAccessible(false);
-			}
-			return locationService;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	/**
-	 * Loads the FHIR2 FhirOrganizationService from the Application Context
-	 * 
-	 * @return FhirLocationService
-	 */
-	private FhirOrganizationService getFhirOrganizationService() {
-		try {
-			Field serviceContextField = Context.class.getDeclaredField("serviceContext");
-			serviceContextField.setAccessible(true);
-			FhirOrganizationService organizationService;
-			try {
-				ApplicationContext applicationContext = ((ServiceContext) serviceContextField.get(null))
-				        .getApplicationContext();
-				organizationService = applicationContext.getBean(FhirOrganizationService.class);
-			}
-			finally {
-				serviceContextField.setAccessible(false);
-			}
-			return organizationService;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	/**
@@ -190,7 +161,6 @@ public class FacilityRegistryTask extends AbstractTask {
 	}
 	
 	private void saveOrUpdateLocation(Location newLocation) {
-		FhirLocationService locationService = getFhirLocationService();
 		Location existingLocation;
 		try {
 			existingLocation = locationService.get(newLocation.getIdElement().getIdPart());
@@ -209,7 +179,6 @@ public class FacilityRegistryTask extends AbstractTask {
 	}
 	
 	private void saveOrUpdateOrganization(Organization newOrganization) {
-		FhirOrganizationService organizationService = getFhirOrganizationService();
 		Organization existingOrganization;
 		try {
 			existingOrganization = organizationService.get(newOrganization.getIdElement().getIdPart());
@@ -249,4 +218,8 @@ public class FacilityRegistryTask extends AbstractTask {
 		return orgLocation;
 	}
 	
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
 }

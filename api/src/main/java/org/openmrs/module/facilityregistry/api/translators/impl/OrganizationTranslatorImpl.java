@@ -62,13 +62,26 @@ public class OrganizationTranslatorImpl extends BaseReferenceHandlingTranslator 
 		identifier.setSystem(
 		    administrationService.getGlobalProperty(FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM,
 		        "http://fhir.openmrs.org/organization/identifier")).setValue(openmrsOrg.getUuid());
-		for (FhirOganizationAddress openmrsAddress : openmrsOrg.getAddress()) {
-			Address fhirAddress = fhirOrg.addAddress();
-			fhirAddress.setCity(openmrsAddress.getCity());
-			fhirAddress.setState(openmrsAddress.getState());
-			fhirAddress.setDistrict(openmrsAddress.getDistrict());
-			fhirAddress.setCountry(openmrsAddress.getCountry());
-			fhirAddress.setPostalCode(openmrsAddress.getPostalCode());
+		if (openmrsOrg.getAddress() != null) {
+			for (FhirOganizationAddress openmrsAddress : openmrsOrg.getAddress()) {
+				Address fhirAddress = fhirOrg.addAddress();
+				if (openmrsAddress.getCity() != null) {
+					fhirAddress.setCity(openmrsAddress.getCity());
+				}
+				if (openmrsAddress.getState() != null) {
+					fhirAddress.setState(openmrsAddress.getState());
+				}
+				if (openmrsAddress.getDistrict() != null) {
+					fhirAddress.setDistrict(openmrsAddress.getDistrict());
+				}
+				if (openmrsAddress.getCountry() != null) {
+					fhirAddress.setCountry(openmrsAddress.getCountry());
+				}
+				
+				if (openmrsAddress.getPostalCode() != null) {
+					fhirAddress.setPostalCode(openmrsAddress.getPostalCode());
+				}
+			}
 		}
 		fhirOrg.setActive(openmrsOrg.getActive());
 		for (Concept concept : openmrsOrg.getType()) {

@@ -55,9 +55,9 @@ public class FhirOrganizationServiceImpl extends BaseFhirService<Organization, F
 	
 	@Override
 	@Transactional(readOnly = true)
-	public IBundleProvider searchForLocations(StringAndListParam name, StringAndListParam city, StringAndListParam country,
-	        StringAndListParam postalCode, StringAndListParam state, TokenAndListParam id, DateRangeParam lastUpdated,
-	        HashSet<Include> includes, SortSpec sort) {
+	public IBundleProvider searchForOrganizations(StringAndListParam name, StringAndListParam city,
+	        StringAndListParam country, StringAndListParam postalCode, StringAndListParam state, TokenAndListParam id,
+	        DateRangeParam lastUpdated, HashSet<Include> includes, SortSpec sort) {
 		
 		SearchParameterMap theParams = new SearchParameterMap().addParameter(FhirConstants.NAME_SEARCH_HANDLER, name)
 		        .addParameter(FhirConstants.CITY_SEARCH_HANDLER, city)
