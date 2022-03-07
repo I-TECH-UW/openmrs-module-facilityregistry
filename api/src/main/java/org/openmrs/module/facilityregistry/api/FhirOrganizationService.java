@@ -22,7 +22,7 @@ import org.openmrs.module.fhir2.api.FhirService;
 
 public interface FhirOrganizationService extends FhirService<Organization> {
 	
-	IBundleProvider searchForLocations(StringAndListParam name, StringAndListParam city, StringAndListParam country,
+	IBundleProvider searchForOrganizations(StringAndListParam name, StringAndListParam city, StringAndListParam country,
 	        StringAndListParam postalCode, StringAndListParam state, TokenAndListParam id, DateRangeParam lastUpdated,
 	        HashSet<Include> includes, SortSpec sort);
 }

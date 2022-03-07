@@ -65,7 +65,7 @@ public class OrganizationFhirResourceProvider implements IResourceProvider {
 	
 	@Read
 	@SuppressWarnings("unused")
-	public Organization getLocationById(@IdParam @Nonnull IdType id) {
+	public Organization getOrganizationById(@IdParam @Nonnull IdType id) {
 		Organization organization = fhirOrganizationService.get(id.getIdPart());
 		if (organization == null) {
 			throw new ResourceNotFoundException("Could not find Organization with Id " + id.getIdPart());
@@ -89,7 +89,7 @@ public class OrganizationFhirResourceProvider implements IResourceProvider {
 	
 	@Delete
 	@SuppressWarnings("unused")
-	public OperationOutcome deleteLocation(@IdParam @Nonnull IdType id) {
+	public OperationOutcome deleteOrganization(@IdParam @Nonnull IdType id) {
 		Organization organization = fhirOrganizationService.delete(id.getIdPart());
 		if (organization == null) {
 			throw new ResourceNotFoundException("Could not find Organization to delete with id " + id.getIdPart());
@@ -99,7 +99,7 @@ public class OrganizationFhirResourceProvider implements IResourceProvider {
 	
 	@History
 	@SuppressWarnings("unused")
-	public List<Resource> getLocationHistoryById(@IdParam @Nonnull IdType id) {
+	public List<Resource> getOrganizationHistoryById(@IdParam @Nonnull IdType id) {
 		Organization organization = fhirOrganizationService.get(id.getIdPart());
 		if (organization == null) {
 			throw new ResourceNotFoundException("Could not find Organization with Id " + id.getIdPart());
@@ -108,7 +108,7 @@ public class OrganizationFhirResourceProvider implements IResourceProvider {
 	}
 	
 	@Search
-	public IBundleProvider searchLocations(@OptionalParam(name = Organization.SP_NAME) StringAndListParam name,
+	public IBundleProvider searchOrganizations(@OptionalParam(name = Organization.SP_NAME) StringAndListParam name,
 	        @OptionalParam(name = Organization.SP_ADDRESS_CITY) StringAndListParam city,
 	        @OptionalParam(name = Organization.SP_ADDRESS_COUNTRY) StringAndListParam country,
 	        @OptionalParam(name = Organization.SP_ADDRESS_POSTALCODE) StringAndListParam postalCode,
@@ -122,7 +122,7 @@ public class OrganizationFhirResourceProvider implements IResourceProvider {
 			includes = null;
 		}
 		
-		return fhirOrganizationService.searchForLocations(name, city, country, postalCode, state, id, lastUpdated, includes,
-		    sort);
+		return fhirOrganizationService.searchForOrganizations(name, city, country, postalCode, state, id, lastUpdated,
+		    includes, sort);
 	}
 }
