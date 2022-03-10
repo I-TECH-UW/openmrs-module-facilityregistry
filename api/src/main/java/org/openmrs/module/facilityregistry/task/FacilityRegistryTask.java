@@ -53,14 +53,14 @@ public class FacilityRegistryTask extends AbstractTask implements ApplicationCon
 	private static final Logger log = LoggerFactory.getLogger(FacilityRegistryTask.class);
 	
 	private static ApplicationContext applicationContext;
-
+	
 	@Autowired
 	@Qualifier("adminService")
 	private AdministrationService administrationService;
-
+	
 	@Autowired
 	private FacilityRegistryUtils facilityRegistryUtils;
-
+	
 	@Override
 	public void execute() {
 		
@@ -87,25 +87,25 @@ public class FacilityRegistryTask extends AbstractTask implements ApplicationCon
 		}
 		
 	}
-
+	
 	private IGenericClient getFhirClient() throws IOException {
 		administrationService = Context.getAdministrationService();
 		String fhirStorePath = administrationService.getGlobalProperty(
-				FacilityRegistryConstants.GP_FACILITY_REGISTRY_SERVER_URL, "http://localhost:4000/fhir/DEFAULT");
+		    FacilityRegistryConstants.GP_FACILITY_REGISTRY_SERVER_URL, "http://localhost:4000/fhir/DEFAULT");
 		String authUrl = administrationService.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_AUTH_URL,
-				"http://localhost:4000/auth/token");
+		    "http://localhost:4000/auth/token");
 		String authUserName = administrationService
-				.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_USER_NAME, "root@gofr.org");
+		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_USER_NAME, "root@gofr.org");
 		String authPassword = administrationService
-				.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_PASSWORD, "gofr");
-
+		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_PASSWORD, "gofr");
+		
 		String token = FhirUtils.getAccesToken(authUrl, authUserName, authPassword);
 		log.info("generating Bearer Token");
 		log.debug(token);
-
+		
 		return FhirUtils.getFhirClient(fhirStorePath, token);
 	}
-
+	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;

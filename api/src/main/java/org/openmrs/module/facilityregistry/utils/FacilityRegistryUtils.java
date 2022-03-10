@@ -29,17 +29,18 @@ import org.springframework.stereotype.Component;
 @Component
 @Setter(AccessLevel.PACKAGE)
 public class FacilityRegistryUtils {
+	
 	@Autowired
 	private FhirLocationService locationService;
-
+	
 	@Autowired
 	private FhirOrganizationService organizationService;
-
+	
 	private static final Logger log = LoggerFactory.getLogger(FacilityRegistryUtils.class);
-
+	
 	/**
 	 * Saves/Updates Fhir Location into the OpenMRS database
-	 *
+	 * 
 	 * @param searchBundle Bundle fetched from the Facility Registry Server
 	 */
 	public Resource saveFhirLocation(Bundle searchBundle, IGenericClient fhirClient) {
@@ -49,10 +50,10 @@ public class FacilityRegistryUtils {
 					Location newLocation = (Location) entry.getResource();
 					// tag the Location from Facility Registry as mCSD Location
 					newLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION_FHIR_SYSTEM,
-							FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION,
-							FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION);
+					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION,
+					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION);
 					// tag Laboratory locations as mCSD Laboratory
-					if(newLocation.hasType("Laboratory")) {
+					if (newLocation.hasType("Laboratory")) {
 						newLocation.getMeta().addTag("mCSD Laboratory", "mCSD Laboratory", "mCSD Laboratory");
 					}
 					return saveOrUpdateLocation(newLocation);
@@ -60,26 +61,26 @@ public class FacilityRegistryUtils {
 					Organization organization = (Organization) entry.getResource();
 					if (organization.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL)) {
 						Extension extParOf = organization.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL)
-								.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
+						        .getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
 						Type referenceOrgType = extParOf.getValue();
 						if (referenceOrgType instanceof Reference) {
 							Reference reference = (Reference) referenceOrgType;
 							String referenceOrgId = reference.getReference();
 							Organization mcsdReferenceOrg = fhirClient.read().resource(Organization.class)
-									.withId(referenceOrgId).encodedJson().execute();
+							        .withId(referenceOrgId).encodedJson().execute();
 							saveOrUpdateOrganization(mcsdReferenceOrg);
 							// save the mcsd reference Organization as a location
 							Location mcsdreferenceLocation = convertOrganisationToLocation(mcsdReferenceOrg);
 							saveOrUpdateLocation(mcsdreferenceLocation);
-
+							
 						}
 					}
 					if (organization.hasPartOf()) {
 						String parentOrgId = organization.getPartOf().getReference();
 						Organization partOfOrg = fhirClient.read().resource(Organization.class).withId(parentOrgId)
-								.encodedJson().execute();
+						        .encodedJson().execute();
 						saveOrUpdateOrganization(partOfOrg);
-
+						
 					}
 					return saveOrUpdateOrganization(organization);
 				}
@@ -87,20 +88,21 @@ public class FacilityRegistryUtils {
 		}
 		return null;
 	}
-
+	
 	private Organization saveOrUpdateOrganization(Organization newOrganization) {
 		return (Organization) saveOrUpdate(newOrganization, organizationService);
 	}
-
+	
 	private Location saveOrUpdateLocation(Location newLocation) {
 		return (Location) saveOrUpdate(newLocation, locationService);
 	}
-
-	private IAnyResource saveOrUpdate(IAnyResource newResource, FhirService service ) {
+	
+	private IAnyResource saveOrUpdate(IAnyResource newResource, FhirService service) {
 		IAnyResource existing;
 		try {
 			existing = service.get(newResource.getIdElement().getIdPart());
-		} catch (ResourceNotFoundException e) {
+		}
+		catch (ResourceNotFoundException e) {
 			existing = null;
 		}
 		if (Objects.isNull(existing)) {
@@ -109,10 +111,10 @@ public class FacilityRegistryUtils {
 			return service.update(newResource.getIdElement().getIdPart(), newResource);
 		}
 	}
-
+	
 	/**
 	 * Converts mcsd Organisation to Location to be persisted by the Fhir Location Service
-	 *
+	 * 
 	 * @param organisation Organisation to be converted
 	 * @return converted Location
 	 */
@@ -127,9 +129,9 @@ public class FacilityRegistryUtils {
 		orgLocation.setIdentifier(organisation.getIdentifier());
 		// tag the Organisation from Facility Registry as mCSD_Organisation
 		orgLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM,
-				FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION,
-				FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION);
+		    FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION,
+		    FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION);
 		return orgLocation;
 	}
-
+	
 }

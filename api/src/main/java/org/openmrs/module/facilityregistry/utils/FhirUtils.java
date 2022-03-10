@@ -43,10 +43,10 @@ public class FhirUtils {
 		fhirClient.registerInterceptor(authInterceptor);
 		return fhirClient;
 	}
-
+	
 	/**
 	 * Create Fhir Client
-	 *
+	 * 
 	 * @param fhirStorePath fhir server Base Url
 	 * @return IGenericClient
 	 */
@@ -54,16 +54,16 @@ public class FhirUtils {
 		IGenericClient fhirClient = getFhirContext().newRestfulGenericClient(fhirStorePath);
 		return fhirClient;
 	}
-
+	
 	/**
 	 * Return FHIR parser
-	 *
+	 * 
 	 * @return Parser
 	 */
 	public static IParser getParser() {
 		return getFhirContext().newJsonParser();
 	}
-
+	
 	/**
 	 * Generate Bearer Authentication Token
 	 * 
