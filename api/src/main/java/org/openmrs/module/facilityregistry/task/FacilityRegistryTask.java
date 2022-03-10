@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 import org.openmrs.api.AdministrationService;
+import org.openmrs.module.facilityregistry.utils.FacilityRegistryUtils;
 import org.openmrs.scheduler.tasks.AbstractTask;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,17 +53,14 @@ public class FacilityRegistryTask extends AbstractTask implements ApplicationCon
 	private static final Logger log = LoggerFactory.getLogger(FacilityRegistryTask.class);
 	
 	private static ApplicationContext applicationContext;
-	
+
 	@Autowired
 	@Qualifier("adminService")
 	private AdministrationService administrationService;
-	
+
 	@Autowired
-	private FhirLocationService locationService;
-	
-	@Autowired
-	FhirOrganizationService organizationService;
-	
+	private FacilityRegistryUtils facilityRegistryUtils;
+
 	@Override
 	public void execute() {
 		
@@ -78,10 +76,10 @@ public class FacilityRegistryTask extends AbstractTask implements ApplicationCon
 			searchBundle = getFhirClient().search().forResource(Location.class).include(Location.INCLUDE_ORGANIZATION)
 			        .returnBundle(Bundle.class).execute();
 			log.debug(FhirUtils.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(searchBundle));
-			saveFhirLocation(searchBundle);
+			facilityRegistryUtils.saveFhirLocation(searchBundle, getFhirClient());
 			while (searchBundle.getLink(IBaseBundle.LINK_NEXT) != null) {
 				searchBundle = getFhirClient().loadPage().next(searchBundle).execute();
-				saveFhirLocation(searchBundle);
+				facilityRegistryUtils.saveFhirLocation(searchBundle, getFhirClient());
 			}
 		}
 		catch (IOException e) {
@@ -89,135 +87,25 @@ public class FacilityRegistryTask extends AbstractTask implements ApplicationCon
 		}
 		
 	}
-	
-	/**
-	 * Creates Fhir Client with Bearer Authentication
-	 * 
-	 * @return IGenericClient
-	 */
+
 	private IGenericClient getFhirClient() throws IOException {
 		administrationService = Context.getAdministrationService();
 		String fhirStorePath = administrationService.getGlobalProperty(
-		    FacilityRegistryConstants.GP_FACILITY_REGISTRY_SERVER_URL, "http://localhost:4000/fhir/DEFAULT");
+				FacilityRegistryConstants.GP_FACILITY_REGISTRY_SERVER_URL, "http://localhost:4000/fhir/DEFAULT");
 		String authUrl = administrationService.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_AUTH_URL,
-		    "http://localhost:4000/auth/token");
+				"http://localhost:4000/auth/token");
 		String authUserName = administrationService
-		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_USER_NAME, "root@gofr.org");
+				.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_USER_NAME, "root@gofr.org");
 		String authPassword = administrationService
-		        .getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_PASSWORD, "gofr");
-		
+				.getGlobalProperty(FacilityRegistryConstants.GP_FACILITY_REGISTRY_PASSWORD, "gofr");
+
 		String token = FhirUtils.getAccesToken(authUrl, authUserName, authPassword);
 		log.info("generating Bearer Token");
 		log.debug(token);
+
 		return FhirUtils.getFhirClient(fhirStorePath, token);
 	}
-	
-	/**
-	 * Saves/Updates Fhir Location into the OpenMRS database
-	 * 
-	 * @param searchBundle Bundle fetched from the Facility Registry Server
-	 * @throws IOException
-	 */
-	private void saveFhirLocation(Bundle searchBundle) throws IOException {
-		for (BundleEntryComponent entry : searchBundle.getEntry()) {
-			if (entry.hasResource()) {
-				if (ResourceType.Location.equals(entry.getResource().getResourceType())) {
-					Location newLocation = (Location) entry.getResource();
-					// tag the Location from Facility Registry as mCSD Location
-					newLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION_FHIR_SYSTEM,
-					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION,
-					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION);
-					saveOrUpdateLocation(newLocation);
-				} else if (ResourceType.Organization.equals(entry.getResource().getResourceType())) {
-					Organization organization = (Organization) entry.getResource();
-					if (organization.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL)) {
-						Extension extParOf = organization.getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL)
-						        .getExtensionByUrl(FacilityRegistryConstants.MCSD_EXTENTION_URL_PART_OF);
-						Type referenceOrgType = extParOf.getValue();
-						if (referenceOrgType instanceof Reference) {
-							Reference reference = (Reference) referenceOrgType;
-							String referenceOrgId = reference.getReference();
-							Organization mcsdReferenceOrg = getFhirClient().read().resource(Organization.class)
-							        .withId(referenceOrgId).encodedJson().execute();
-							saveOrUpdateOrganization(mcsdReferenceOrg);
-							// save the mcsd reference Organization as a location
-							Location mcsdreferenceLocation = convertOrganisationToLocation(mcsdReferenceOrg);
-							saveOrUpdateLocation(mcsdreferenceLocation);
-							
-						}
-					}
-					if (organization.hasPartOf()) {
-						String parentOrgId = organization.getPartOf().getReference();
-						Organization partOfOrg = getFhirClient().read().resource(Organization.class).withId(parentOrgId)
-						        .encodedJson().execute();
-						saveOrUpdateOrganization(partOfOrg);
-						
-					}
-					saveOrUpdateOrganization(organization);
-				}
-			}
-		}
-		
-	}
-	
-	private void saveOrUpdateLocation(Location newLocation) {
-		Location existingLocation;
-		try {
-			existingLocation = locationService.get(newLocation.getIdElement().getIdPart());
-		}
-		catch (ResourceNotFoundException e) {
-			existingLocation = null;
-		}
-		if (Objects.isNull(existingLocation)) {
-			locationService.create(newLocation);
-			log.debug("created new Location Resource with ID " + newLocation.getIdElement().getIdPart());
-		} else {
-			locationService.update(newLocation.getIdElement().getIdPart(), newLocation);
-			log.debug("Updated Location Resource with ID " + newLocation.getIdElement().getIdPart());
-		}
-		
-	}
-	
-	private void saveOrUpdateOrganization(Organization newOrganization) {
-		Organization existingOrganization;
-		try {
-			existingOrganization = organizationService.get(newOrganization.getIdElement().getIdPart());
-		}
-		catch (ResourceNotFoundException e) {
-			existingOrganization = null;
-		}
-		if (Objects.isNull(existingOrganization)) {
-			organizationService.create(newOrganization);
-			log.debug("created new Organization Resource with ID " + newOrganization.getIdElement().getIdPart());
-		} else {
-			organizationService.update(newOrganization.getIdElement().getIdPart(), newOrganization);
-			log.debug("Updated Organization Resource with ID " + newOrganization.getIdElement().getIdPart());
-		}
-		
-	}
-	
-	/**
-	 * Converts mcsd Organisation to Location to be persisted by the Fhir Location Service
-	 * 
-	 * @param organisation Organisation to be converted
-	 * @return converted Location
-	 */
-	private Location convertOrganisationToLocation(Organization organisation) {
-		Location orgLocation = new Location();
-		orgLocation.setId(organisation.getIdElement().getIdPart());
-		orgLocation.setName(organisation.getName());
-		orgLocation.setDescription(organisation.getName());
-		orgLocation.setAddress(organisation.getAddressFirstRep());
-		orgLocation.setStatus(LocationStatus.ACTIVE);
-		orgLocation.setType(organisation.getType());
-		orgLocation.setIdentifier(organisation.getIdentifier());
-		// tag the Organisation from Facility Registry as mCSD_Organisation
-		orgLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION_FHIR_SYSTEM,
-		    FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION,
-		    FacilityRegistryConstants.FACILITY_REGISTRY_ORGANISATION);
-		return orgLocation;
-	}
-	
+
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
