@@ -12,6 +12,7 @@ package org.openmrs.module.facilityregistry.utils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import ca.uhn.fhir.parser.IParser;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -24,6 +25,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.facilityregistry.FacilityRegistryConstants;
 
 public class FhirUtils {
 	
@@ -39,6 +42,26 @@ public class FhirUtils {
 		BearerTokenAuthInterceptor authInterceptor = new BearerTokenAuthInterceptor(token);
 		fhirClient.registerInterceptor(authInterceptor);
 		return fhirClient;
+	}
+	
+	/**
+	 * Create Fhir Client
+	 * 
+	 * @param fhirStorePath fhir server Base Url
+	 * @return IGenericClient
+	 */
+	public static IGenericClient getFhirClient(String fhirStorePath) {
+		IGenericClient fhirClient = getFhirContext().newRestfulGenericClient(fhirStorePath);
+		return fhirClient;
+	}
+	
+	/**
+	 * Return FHIR parser
+	 * 
+	 * @return Parser
+	 */
+	public static IParser getParser() {
+		return getFhirContext().newJsonParser();
 	}
 	
 	/**

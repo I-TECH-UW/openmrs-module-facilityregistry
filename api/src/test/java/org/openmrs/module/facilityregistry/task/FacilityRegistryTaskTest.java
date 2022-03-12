@@ -31,7 +31,7 @@ public class FacilityRegistryTaskTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test(expected = None.class)
-	public void shedulerShouldSheduleFacilityRegistryTask() throws Exception {
+	public void shedulerShouldScheduleFacilityRegistryTask() throws Exception {
 		String taskClassName = "org.openmrs.module.facilityregistry.task.FacilityRegistryTask";
 		TaskDefinition facilitRegistryTask = getFacilityRegistryTask(taskClassName);
 		facilitRegistryTask = getFacilityRegistryTask(taskClassName);
@@ -40,7 +40,7 @@ public class FacilityRegistryTaskTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test(expected = ValidationException.class)
-	public void shedulerShouldNotSheduleWrongFacilityRegistryTaskName() throws Exception {
+	public void shedulerShouldNotScheduleWrongFacilityRegistryTaskName() throws Exception {
 		String worngTaskClassName = "org.openmrs.module.facilityregistry.wrong.FacilityRegistryTask";
 		TaskDefinition facilitRegistryTask = getFacilityRegistryTask(worngTaskClassName);
 		schedulerService.scheduleTask(facilitRegistryTask);
