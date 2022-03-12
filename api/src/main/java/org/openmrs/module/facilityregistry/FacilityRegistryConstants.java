@@ -35,4 +35,6 @@ public class FacilityRegistryConstants {
 	
 	public static final String MCSD_EXTENTION_URL_HIERACHY_TYPE = "hierarchy-type";
 	
+	public static final String FACILITY_REGISTRY_LABORATORY = "mCSD Laboratory";
+	
 }

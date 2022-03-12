@@ -1,6 +1,5 @@
 package org.openmrs.module.facilityregistry.utils;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -9,16 +8,15 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.hl7.fhir.r4.model.Type;
 import org.openmrs.module.facilityregistry.FacilityRegistryConstants;
 import org.openmrs.module.facilityregistry.api.FhirOrganizationService;
-import org.openmrs.module.facilityregistry.task.FacilityRegistryTask;
 import org.openmrs.module.fhir2.api.FhirLocationService;
 import org.openmrs.module.fhir2.api.FhirService;
 import org.slf4j.Logger;
@@ -43,7 +41,7 @@ public class FacilityRegistryUtils {
 	 * 
 	 * @param searchBundle Bundle fetched from the Facility Registry Server
 	 */
-	public Resource saveFhirLocation(Bundle searchBundle, IGenericClient fhirClient) {
+	public void saveFhirLocation(Bundle searchBundle, IGenericClient fhirClient) {
 		for (Bundle.BundleEntryComponent entry : searchBundle.getEntry()) {
 			if (entry.hasResource()) {
 				if (ResourceType.Location.equals(entry.getResource().getResourceType())) {
@@ -52,11 +50,21 @@ public class FacilityRegistryUtils {
 					newLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION_FHIR_SYSTEM,
 					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION,
 					    FacilityRegistryConstants.FACILITY_REGISTRY_LOCATION);
-					// tag Laboratory locations as mCSD Laboratory
-					if (newLocation.hasType("Laboratory")) {
-						newLocation.getMeta().addTag("mCSD Laboratory", "mCSD Laboratory", "mCSD Laboratory");
+					// tag Laboratory locations as mCSD Laboratory  Laboratory
+					if (newLocation.hasType()) {
+						for (CodeableConcept code : newLocation.getType()) {
+							if (code.hasText()) {
+								if (code.getText().equals("Laboratory")) {
+									newLocation.getMeta().addTag(FacilityRegistryConstants.FACILITY_REGISTRY_LABORATORY,
+									    FacilityRegistryConstants.FACILITY_REGISTRY_LABORATORY,
+									    FacilityRegistryConstants.FACILITY_REGISTRY_LABORATORY);
+								}
+							}
+						}
+						
 					}
-					return saveOrUpdateLocation(newLocation);
+					
+					saveOrUpdateLocation(newLocation);
 				} else if (ResourceType.Organization.equals(entry.getResource().getResourceType())) {
 					Organization organization = (Organization) entry.getResource();
 					if (organization.hasExtension(FacilityRegistryConstants.MCSD_EXTENTION_URL)) {
@@ -82,11 +90,10 @@ public class FacilityRegistryUtils {
 						saveOrUpdateOrganization(partOfOrg);
 						
 					}
-					return saveOrUpdateOrganization(organization);
+					saveOrUpdateOrganization(organization);
 				}
 			}
 		}
-		return null;
 	}
 	
 	private Organization saveOrUpdateOrganization(Organization newOrganization) {

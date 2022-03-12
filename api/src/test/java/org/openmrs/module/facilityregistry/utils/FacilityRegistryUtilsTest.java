@@ -1,6 +1,7 @@
 package org.openmrs.module.facilityregistry.utils;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -15,7 +16,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Location;
-import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +60,7 @@ public class FacilityRegistryUtilsTest extends TestCase {
 		when(locationService.create(any(Location.class))).thenReturn(exampleLocation);
 		
 		frUtils.saveFhirLocation(searchBundle, fhirClient);
+		verify(locationService).create(exampleLocation);
 	}
 	
 	private Bundle getExampleBundle() throws IOException {
@@ -74,15 +75,11 @@ public class FacilityRegistryUtilsTest extends TestCase {
 				String result = EntityUtils.toString(entity);
 				System.out.println(result);
 				
-				// Parse it
-				// TODO: FIGURE OUT JACKSON ISSUE WITH PARSER: https://stackoverflow.com/questions/56872363/couldnt-resolve-error-java-lang-nosuchfielderror-fail-on-symbol-hash-overflow
-				// TODO: and https://github.com/hapifhir/hapi-fhir/issues/2873
 				Bundle parsed = FhirUtils.getParser().parseResource(Bundle.class, result);
 				
 				return parsed;
 			}
 		}
-		
 		return null;
 	}
 }
