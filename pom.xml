@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 <project
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+=======
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+>>>>>>> 58dff4b (Update package publish workflows)
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -134,6 +138,15 @@
 				<version>${lombokVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+<<<<<<< HEAD
+=======
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombokVersion}</version>
+				<scope>provided</scope>
+			</dependency>
+>>>>>>> 58dff4b (Update package publish workflows)
 		</dependencies>
 	</dependencyManagement>
 	<build>
@@ -163,6 +176,30 @@
 			</plugin>
 		</plugins>
 	</build>
+<<<<<<< HEAD
+=======
+	<profiles>
+    <profile>
+      <!-- Github Packages Integration -->
+      <id>github-packages</id>
+      <distributionManagement>
+        <!-- Deploy to Github Packages -->
+        <repository>
+          <id>github-packages</id>
+          <name>Github Maven Repo</name>
+          <url>https://maven.pkg.github.com/openmrs/openmrs-module-facilityregistry</url>
+          <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+          <id>github-packages</id>
+          <name>Github Maven Repo</name>
+          <url>https://maven.pkg.github.com/openmrs/openmrs-module-facilityregistry</url>
+          <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+  </profiles>
+>>>>>>> 58dff4b (Update package publish workflows)
 	<properties>
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<fhir2Version>1.4.0-SNAPSHOT</fhir2Version>
