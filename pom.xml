@@ -163,6 +163,27 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+    <profile>
+      <!-- Github Packages Integration -->
+      <id>github-packages</id>
+      <distributionManagement>
+        <!-- Deploy to Github Packages -->
+        <repository>
+          <id>github-packages</id>
+          <name>Github Maven Repo</name>
+          <url>https://maven.pkg.github.com/openmrs/openmrs-module-facilityregistry</url>
+          <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+          <id>github-packages</id>
+          <name>Github Maven Repo</name>
+          <url>https://maven.pkg.github.com/openmrs/openmrs-module-facilityregistry</url>
+          <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+  </profiles>
 	<properties>
 		<openmrsPlatformVersion>2.0.5</openmrsPlatformVersion>
 		<fhir2Version>1.4.0-SNAPSHOT</fhir2Version>
